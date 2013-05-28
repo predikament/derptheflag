@@ -155,6 +155,7 @@ public class Game extends Canvas implements Runnable
 		System.exit(0);
 	}
 	
+	// Input handler, needs to be remade to handle several keystrokes at once
 	private class InputHandler implements KeyListener, MouseListener
 	{
 		private final Game game;
@@ -230,10 +231,6 @@ public class Game extends Canvas implements Runnable
 				case KeyEvent.VK_ESCAPE:
 					game.stop();
 					break;
-				
-				case KeyEvent.VK_F10:
-					displayFPS = !displayFPS;
-					break;
 					
 				default:
 					break;
@@ -247,7 +244,17 @@ public class Game extends Canvas implements Runnable
 
 		public void keyTyped(KeyEvent event) 
 		{
+			int keycode = event.getKeyCode();
 			
+			switch (keycode)
+			{
+				case KeyEvent.VK_F10:
+					displayFPS = !displayFPS;
+					break;
+
+				default:
+					break;
+			}
 		}
 	}
 }

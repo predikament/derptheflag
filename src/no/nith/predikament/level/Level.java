@@ -32,7 +32,8 @@ public class Level
 		Unit unit = Unit.create(this, random.nextInt(Unit.TOTAL_UNITS));
 		
 		// Set start position for player unit
-		Vector2 unitPosition = new Vector2((width - 8) / 2.0, (height - 8) / 2.0);
+		Vector2 unitPosition = new Vector2(	(getWidth() - unit.getHitbox().getWidth()) / 2.0, 
+											(getHeight() - unit.getHitbox().getHeight()) / 2.0);
 		unit.setPosition(unitPosition);
 		
 		player = new Player(unit);
