@@ -54,19 +54,14 @@ public class Level
 	{
 		player.update(dt);
 		
-		Vector2 player_velocity = player.getTarget().getVelocity();
-		
-		player_velocity.x += GRAVITY.x * dt;
-		player_velocity.y += GRAVITY.y * dt;
-		player_velocity.x *= FRICTION.x * dt;
-		player_velocity.y *= FRICTION.y * dt;
-		
 		for (Entity e : entities)
 		{
 			if (e.wasRemoved() == false)
 			{
 				if (e instanceof PhysicsEntity)
 				{
+					// Apply level gravity here somewhere
+					@SuppressWarnings("unused")
 					PhysicsEntity p = (PhysicsEntity) e;
 				}
 				

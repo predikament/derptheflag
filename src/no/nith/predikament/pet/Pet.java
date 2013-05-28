@@ -8,6 +8,7 @@ import no.nith.predikament.util.Vector2;
 
 public class Pet extends PhysicsEntity 
 {
+	@SuppressWarnings("unused")
 	private Level level;
 	private PhysicsEntity target;
 	private int ySpriteIndex;
@@ -26,11 +27,7 @@ public class Pet extends PhysicsEntity
 
 	public void update(double dt) 
 	{
-		Vector2 pos = getPosition();
-		Vector2 acc = new Vector2();
 		
-		if (pos.x > target.getPosition().x) acc.x += 1;
-		else acc.x += -1;
 	}
 
 	public void render(Bitmap screen) 

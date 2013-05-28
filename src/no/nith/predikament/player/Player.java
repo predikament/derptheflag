@@ -6,6 +6,7 @@ import no.nith.predikament.util.Vector2;
 
 public class Player 
 {
+	@SuppressWarnings("unused")
 	private static final Vector2 DECELERATION_FACTOR = new Vector2(1, 1);
 	public static final Vector2 JUMP_VECTOR = new Vector2(0, 300);
 	public static final double VELOCITY_MAX = 200;

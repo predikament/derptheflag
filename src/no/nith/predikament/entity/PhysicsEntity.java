@@ -62,14 +62,7 @@ public abstract class PhysicsEntity extends Entity
 	
 	public void update(double dt)
 	{
-		setPosition(Vector2.add(getPosition(), new Vector2(getVelocity().x * dt, getVelocity().y * dt)));
-		setVelocity(new Vector2(getVelocity().x * 0.90 * dt, getVelocity().y * 0.90 * dt));
 		
-		System.out.println("Current vel.x: " + getVelocity().x + "\nCurrent vel.y: " + getVelocity().y);
-		// Clip velocity
-		if (getVelocity().x < 10 && getVelocity().x > -10) setVelocity(new Vector2(0, getVelocity().y));
-		/*if (-getVelocity().x <= 0.01) setVelocity(new Vector2(0, getVelocity().y));
-		else if (-getVelocity().y <= 0.01) setVelocity(new Vector2(getVelocity().x, 0));*/
 	}
 	
 	public Vector2 getVelocity() 

@@ -56,11 +56,6 @@ public abstract class Unit extends PhysicsEntity
 		return newUnit;
 	}
 	
-	public void update(double dt) 
-	{
-		super.update(dt);
-	}
-	
 	public void render(Bitmap screen) 
 	{
 		boolean flip = false;
