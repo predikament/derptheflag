@@ -177,7 +177,14 @@ public class Game extends Canvas implements Runnable
 		// MouseListener
 		public synchronized void mousePressed(MouseEvent event) 
 		{	
+			Unit unit = Unit.create(game.level, random.nextInt(Unit.TOTAL_UNITS));
 			
+			double mouseX = (event.getX() / SCALE) - (unit.getHitbox().getWidth() / 2);
+			double mouseY = (event.getY() / SCALE) - (unit.getHitbox().getHeight() / 2);
+			
+			unit.setPosition(mouseX, mouseY);
+						
+			level.addEntity(unit);
 		}
 		
 		public synchronized void mouseReleased(MouseEvent event) 
@@ -187,14 +194,7 @@ public class Game extends Canvas implements Runnable
 		
 		public synchronized void mouseClicked(MouseEvent event) 
 		{
-			Unit unit = Unit.create(game.level, random.nextInt(Unit.TOTAL_UNITS));
 			
-			double mouseX = (event.getX() / SCALE) - (unit.getHitbox().getWidth() / 2);
-			double mouseY = (event.getY() / SCALE) - (unit.getHitbox().getHeight() / 2);
-			
-			unit.setPosition(mouseX, mouseY);
-						
-			level.addEntity(unit);
 		}
 
 		public synchronized void mouseEntered(MouseEvent event) 

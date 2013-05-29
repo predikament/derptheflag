@@ -12,7 +12,7 @@ public abstract class Unit extends PhysicsEntity
 	private int ySpriteIndex;
 	private int frame;
 	private Vector2 direction;
-	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 250);
+	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 400);
 	public static final int TOTAL_UNITS = 5;
 	
 	public Unit(Level level, int ySpriteIndex)
