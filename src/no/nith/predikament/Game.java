@@ -115,7 +115,7 @@ public class Game extends Canvas implements Runnable
 		int w = WIDTH * SCALE;
 		int h = HEIGHT * SCALE;
 		
-		g.setColor(Color.DARK_GRAY);
+		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, screenWidth, screenHeight);
 		g.drawImage(screenImage, (screenWidth-w) / 2, (screenHeight - h) / 2, w, h, null);
 		g.dispose();

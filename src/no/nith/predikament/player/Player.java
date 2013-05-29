@@ -3,6 +3,8 @@ package no.nith.predikament.player;
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.PhysicsEntity;
 import no.nith.predikament.level.Level;
+import no.nith.predikament.pet.Dog;
+import no.nith.predikament.pet.Pet;
 import no.nith.predikament.util.Vector2;
 
 public class Player 
@@ -12,11 +14,13 @@ public class Player
 	
 	private Level level;
 	private PhysicsEntity target;
+	private Pet pet;
 	
 	public Player(Level level, PhysicsEntity target)
 	{
 		this.level = level;
 		this.target = target;
+		this.pet = new Dog(level, target);
 	}
 	
 	public void moveLeft()
@@ -47,6 +51,16 @@ public class Player
 	public void update(double dt)
 	{
 		target.update(dt);
+	}
+	
+	public boolean hasPet()
+	{
+		return pet != null;
+	}
+	
+	public Pet getPet()
+	{
+		return pet;
 	}
 	
 	public PhysicsEntity getTarget() 

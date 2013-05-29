@@ -29,6 +29,8 @@ public abstract class PhysicsEntity extends Entity
 	{
 		super(new Vector2(x, y));
 		
+		setVelocity(Vector2.zero());
+		
 		// Create hitbox
 		Point p = new Point();
 		p.x = (int) getPosition().x;
@@ -38,9 +40,6 @@ public abstract class PhysicsEntity extends Entity
 		d.setSize(width, height);
 		
 		this.hitbox = new Rectangle(p, d);
-		
-		// Set stuff
-		setVelocity(Vector2.zero());
 	}
 	
 	public void setPosition(Vector2 position)

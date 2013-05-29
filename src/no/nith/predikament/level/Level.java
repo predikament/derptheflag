@@ -44,7 +44,8 @@ public class Level
 		
 		entities.clear();
 
-		entities.add(player.getTarget());
+		addEntity(player.getTarget());
+		if (player.hasPet()) addEntity(player.getPet());
 	}
 	
 	public synchronized void addEntity(Entity entity)
