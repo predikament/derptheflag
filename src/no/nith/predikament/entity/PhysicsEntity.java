@@ -78,8 +78,8 @@ public abstract class PhysicsEntity extends Entity
 	public void setVelocity(Vector2 velocity) 
 	{
 		// Clip velocity at low values to avoid stuttering		
-		if (velocity.x <= 0.1 && velocity.x >= -0.1) velocity.x = 0;
-		if (velocity.y <= 0.1 && velocity.y >= -0.1) velocity.y = 0;
+		if (velocity.x <= 0.5 && velocity.x >= -0.5) velocity.x = 0;
+		if (velocity.y <= 0.5 && velocity.y >= -0.5) velocity.y = 0;
 		
 		this.velocity = velocity;
 	}

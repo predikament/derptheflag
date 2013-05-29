@@ -35,8 +35,8 @@ public class Pet extends PhysicsEntity
 		{
 			Vector2 vel = getVelocity();
 			
-			if (getPosition().x < getTarget().getPosition().x) vel.x += 0.5;
-			else if (getPosition().x > getTarget().getPosition().x) vel.x -= 0.5;
+			if (getPosition().x < getTarget().getPosition().x) vel.x += 0.8;
+			else if (getPosition().x > getTarget().getPosition().x) vel.x -= 0.8;
 		}
 		
 		super.update(dt);

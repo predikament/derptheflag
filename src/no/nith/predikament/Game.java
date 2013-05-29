@@ -91,7 +91,6 @@ public class Game extends Canvas implements Runnable
 	private void render(Bitmap screen)
 	{
 		screen.clear(0);
-		
 		level.render(screen);
 		
 		currentFrameCount++;
@@ -115,7 +114,7 @@ public class Game extends Canvas implements Runnable
 		int w = WIDTH * SCALE;
 		int h = HEIGHT * SCALE;
 		
-		g.setColor(Color.GRAY);
+		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, screenWidth, screenHeight);
 		g.drawImage(screenImage, (screenWidth-w) / 2, (screenHeight - h) / 2, w, h, null);
 		g.dispose();

@@ -48,9 +48,9 @@ public class Bitmap
 		if (x1 > w) x1 = w;
 		if (y1 > h) y1 = h;
 		
-		for (int y = y0; y <= y1; ++y)
+		for (int y = y0; y < y1; ++y)
 		{
-			for (int x = x0; x <= x1; ++x)
+			for (int x = x0; x < x1; ++x)
 			{
 				pixels[x + y * w] = color;
 			}

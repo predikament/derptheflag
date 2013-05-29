@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import no.nith.predikament.Art;
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.Entity;
 import no.nith.predikament.entity.PhysicsEntity;
@@ -13,8 +15,8 @@ import no.nith.predikament.util.Vector2;
 
 public class Level 
 {
-	public Vector2 GRAVITY = new Vector2(0, 0.20);
-	public final Vector2 FRICTION = new Vector2(0.992, 1);
+	public Vector2 GRAVITY = new Vector2(0, 0.60);
+	public final Vector2 FRICTION = new Vector2(0.991, 1);
 	private final Random random = new Random();
 	private Player player;
 	private final int width;
@@ -83,6 +85,9 @@ public class Level
 	
 	public synchronized void render(Bitmap screen)
 	{
+		// Render level background
+		screen.draw(Art.instance.background[0][0], 0, 0);
+		
 		for (Entity e : entities)
 		{
 			if (e.wasRemoved() == false)
