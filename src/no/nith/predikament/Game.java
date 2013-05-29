@@ -209,7 +209,7 @@ public class Game extends Canvas implements Runnable
 		
 		}
 
-		// Keyboard
+		// Keyboard //// Don't think these need to be synchronized, only the update function?
 		public synchronized void keyPressed(KeyEvent event) 
 		{
 			int keycode = event.getKeyCode();
