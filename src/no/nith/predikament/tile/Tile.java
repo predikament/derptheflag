@@ -1,9 +1,9 @@
 package no.nith.predikament.tile;
 
 import no.nith.predikament.Bitmap;
-import no.nith.predikament.entity.Entity;
+import no.nith.predikament.entity.PhysicsEntity;
 
-public class Tile extends Entity 
+public class Tile extends PhysicsEntity 
 {
 	@SuppressWarnings("unused")
 	private int xSpriteIndex, ySpriteIndex;
