@@ -8,7 +8,7 @@ import no.nith.predikament.util.Vector2;
 public class Player 
 {
 	private static final double SPEED_INCREMENT = 1;
-	private static final Vector2 JUMP_VECTOR = new Vector2(0, -200);
+	private static final Vector2 JUMP_VECTOR = new Vector2(0, -100);
 	
 	private Level level;
 	private PhysicsEntity target;

@@ -1,7 +1,5 @@
 package no.nith.predikament.entity.unit;
 
-import java.util.Random;
-
 import no.nith.predikament.Art;
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.PhysicsEntity;
@@ -10,7 +8,6 @@ import no.nith.predikament.util.Vector2;
 
 public abstract class Unit extends PhysicsEntity
 {
-	private final Random random = new Random();
 	private final Level level;
 	private int ySpriteIndex;
 	private int frame;
@@ -57,23 +54,6 @@ public abstract class Unit extends PhysicsEntity
 		}
 		
 		return newUnit;
-	}
-	
-	public void update(double dt)
-	{
-		super.update(dt);
-		
-		if (random.nextDouble() > 0.9999)
-		{
-			if (getHitbox().getMaxY() == level.getHeight())
-			{
-				setVelocity(Vector2.add(getVelocity(), new Vector2(0, -200)));
-			}
-		}
-		if (random.nextDouble() > 0.999)
-		{
-			setVelocity(Vector2.add(getVelocity(), new Vector2(random.nextDouble() >= 0.5 ? 20 : -20, 0)));
-		}
 	}
 	
 	public void render(Bitmap screen) 

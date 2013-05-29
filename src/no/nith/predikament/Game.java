@@ -154,7 +154,6 @@ public class Game extends Canvas implements Runnable
 			swap();
 		}
 		
-		System.out.println("Exiting..");
 		System.exit(0);
 	}
 	
