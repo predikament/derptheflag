@@ -27,7 +27,7 @@ public class Game extends Canvas implements Runnable
 	
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
-	public static final int SCALE	= 3;
+	public static final int SCALE	= 2;
 	
 	private boolean keepRunning;
 	
@@ -163,13 +163,12 @@ public class Game extends Canvas implements Runnable
 	{
 		private final Game game;
 		private final Set<Integer> pressedKeys;
-		private final Set<Integer> releasedKeys;
 		
 		public InputHandler(Game game)
 		{
 			this.game = game;
-			pressedKeys = Collections.synchronizedSet(new HashSet<Integer>());
-			releasedKeys = Collections.synchronizedSet(new HashSet<Integer>());
+			
+			pressedKeys = Collections.synchronizedSet(new HashSet<Integer>(0));
 			
 			game.addKeyListener(this);
 			game.addMouseListener(this);
@@ -222,14 +221,14 @@ public class Game extends Canvas implements Runnable
 		{
 			int keycode = event.getKeyCode();
 			
-			if (releasedKeys.contains(keycode) == false) releasedKeys.add(keycode);
+			if (pressedKeys.contains(keycode) == true) pressedKeys.remove(keycode);
 		}
 
 		public void keyTyped(KeyEvent event) 
 		{
 		}
 		
-		private void update(double dt)
+		private synchronized void update(double dt)
 		{
 			for (int keycode : pressedKeys)
 			{
@@ -265,10 +264,6 @@ public class Game extends Canvas implements Runnable
 						break;
 				}
 			}
-			
-			pressedKeys.removeAll(releasedKeys);
-			
-			if (releasedKeys.size() > 0) releasedKeys.clear();
 		}
 	}
 }

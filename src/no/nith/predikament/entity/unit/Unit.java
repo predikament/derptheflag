@@ -14,7 +14,6 @@ public abstract class Unit extends PhysicsEntity
 	private Vector2 direction;
 	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 250);
 	public static final int TOTAL_UNITS = 5;
-	private double thisTime, lastTime; // Temporary fix for running animation
 	
 	public Unit(Level level, int ySpriteIndex)
 	{
@@ -25,7 +24,6 @@ public abstract class Unit extends PhysicsEntity
 		this.direction = new Vector2();
 		
 		frame = 0;
-		thisTime = lastTime = System.currentTimeMillis();
 	}
 	
 	public static Unit create(Level level, int type)
@@ -61,9 +59,6 @@ public abstract class Unit extends PhysicsEntity
 	public void update(double dt)
 	{
 		super.update(dt);
-		
-		thisTime = System.currentTimeMillis();
-		System.out.println(thisTime);
 	}
 	
 	public void render(Bitmap screen) 
@@ -78,15 +73,6 @@ public abstract class Unit extends PhysicsEntity
 		if (direction.x != 0 && direction.y == 1) frame = 4;
 		else if (direction.x != 0 && direction.y == -1) frame = 3;
 		
-		// Ghetto fix, not working -__-
-		if (thisTime - lastTime >= 500 && (frame == 1 || frame == 2))
-		{
-			if (frame == 1) frame = 2;
-			else frame = 1;
-			
-			lastTime = thisTime;
-		}
-
 		screen.draw(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
 	}
 	
