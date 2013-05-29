@@ -1,5 +1,7 @@
 package no.nith.predikament.util;
 
+import java.awt.Point;
+
 public class Vector2 
 {
 	public double x, y;
@@ -7,6 +9,11 @@ public class Vector2
 	public Vector2()
 	{
 		this(0, 0);
+	}
+	
+	public Vector2(Point point)
+	{
+		this(point.getX(), point.getY());
 	}
 	
 	public Vector2(final double x, final double y)

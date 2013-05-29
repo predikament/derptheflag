@@ -42,6 +42,16 @@ public abstract class PhysicsEntity extends Entity
 		this.hitbox = new Rectangle(p, d);
 	}
 	
+	public void setPosition(int x, int y)
+	{
+		setPosition(new Vector2((double) x, (double) y));
+	}
+	
+	public void setPosition(double x, double y)
+	{
+		setPosition(new Vector2(x, y));
+	}
+	
 	public void setPosition(Vector2 position)
 	{
 		// Set position

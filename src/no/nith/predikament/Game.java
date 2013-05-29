@@ -4,20 +4,22 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-
 import no.nith.predikament.entity.unit.Unit;
 import no.nith.predikament.level.Level;
-import no.nith.predikament.util.Vector2;
 
 public class Game extends Canvas implements Runnable
 {
@@ -27,7 +29,7 @@ public class Game extends Canvas implements Runnable
 	
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
-	public static final int SCALE	= 2;
+	public static final int SCALE	= 3;
 	
 	private boolean keepRunning;
 	
@@ -157,7 +159,7 @@ public class Game extends Canvas implements Runnable
 	}
 	
 	// Input handler, needs to be remade to handle several keystrokes at once
-	private class InputHandler implements KeyListener, MouseListener
+	private class InputHandler implements KeyListener, MouseListener, MouseMotionListener
 	{
 		private final Game game;
 		private final Set<Integer> pressedKeys;
@@ -172,42 +174,51 @@ public class Game extends Canvas implements Runnable
 			game.addMouseListener(this);
 		}
 		
-		// Mouse
-		public void mouseClicked(MouseEvent event) 
-		{
+		// MouseListener
+		public synchronized void mousePressed(MouseEvent event) 
+		{	
 			
 		}
-
-		public void mouseEntered(MouseEvent event) 
-		{
-			
-		}
-
-		public void mouseExited(MouseEvent event) 
-		{
 		
+		public synchronized void mouseReleased(MouseEvent event) 
+		{	
+			
 		}
-
-		public void mousePressed(MouseEvent event) 
+		
+		public synchronized void mouseClicked(MouseEvent event) 
 		{
 			Unit unit = Unit.create(game.level, random.nextInt(Unit.TOTAL_UNITS));
 			
-			double mouseX = ((double) event.getX() / SCALE) - 8.0f;
-			double mouseY = ((double) event.getY() / SCALE) - 8.0f;
+			double mouseX = (event.getX() / SCALE) - (unit.getHitbox().getWidth() / 2);
+			double mouseY = (event.getY() / SCALE) - (unit.getHitbox().getHeight() / 2);
 			
-			Vector2 mousePos = new Vector2(mouseX, mouseY);
-			
-			unit.setPosition(mousePos);
+			unit.setPosition(mouseX, mouseY);
 						
 			level.addEntity(unit);
 		}
 
-		public void mouseReleased(MouseEvent event) 
+		public synchronized void mouseEntered(MouseEvent event) 
+		{
+			
+		}
+
+		public synchronized void mouseExited(MouseEvent event) 
 		{
 		
 		}
+		
+		// MouseMotionListener
+		public synchronized void mouseDragged(MouseEvent event) 
+		{
+			
+		}
 
-		// Keyboard
+		public synchronized void mouseMoved(MouseEvent event) 
+		{
+			
+		}
+
+		// KeyListener
 		public synchronized void keyPressed(KeyEvent event) 
 		{
 			int keycode = event.getKeyCode();
@@ -222,7 +233,7 @@ public class Game extends Canvas implements Runnable
 			if (pressedKeys.contains(keycode) == true) pressedKeys.remove(keycode);
 		}
 
-		public void keyTyped(KeyEvent event) 
+		public synchronized void keyTyped(KeyEvent event) 
 		{
 		}
 		
