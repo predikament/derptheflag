@@ -12,8 +12,9 @@ public abstract class Unit extends PhysicsEntity
 	private int ySpriteIndex;
 	private int frame;
 	private Vector2 direction;
-	
+	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 250);
 	public static final int TOTAL_UNITS = 5;
+	private double thisTime, lastTime; // Temporary fix for running animation
 	
 	public Unit(Level level, int ySpriteIndex)
 	{
@@ -24,6 +25,7 @@ public abstract class Unit extends PhysicsEntity
 		this.direction = new Vector2();
 		
 		frame = 0;
+		thisTime = lastTime = System.currentTimeMillis();
 	}
 	
 	public static Unit create(Level level, int type)
@@ -56,21 +58,38 @@ public abstract class Unit extends PhysicsEntity
 		return newUnit;
 	}
 	
+	public void update(double dt)
+	{
+		super.update(dt);
+		
+		thisTime = System.currentTimeMillis();
+		System.out.println(thisTime);
+	}
+	
 	public void render(Bitmap screen) 
 	{
 		boolean flip = false;
 		
 		if (direction.x == 0) frame = 0;
-		else
+		else frame = 1;
+		
+		if (direction.x == -1) flip = true;
+		
+		if (direction.x != 0 && direction.y == 1) frame = 4;
+		else if (direction.x != 0 && direction.y == -1) frame = 3;
+		
+		// Ghetto fix, not working -__-
+		if (thisTime - lastTime >= 500 && (frame == 1 || frame == 2))
 		{
-			frame = 1;
+			if (frame == 1) frame = 2;
+			else frame = 1;
 			
-			if (direction.x == -1) flip = true;
+			lastTime = thisTime;
 		}
 
 		screen.draw(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
 	}
-
+	
 	public void setPosition(Vector2 position)
 	{
 		// Check bounds of new position
@@ -81,17 +100,20 @@ public abstract class Unit extends PhysicsEntity
 		}
 		else if (level != null && position.y > level.getHeight() - getHitbox().height)
 		{
-			position.y = level.getHeight() - 16;
+			position.y = level.getHeight() - getHitbox().height;
+			setVelocity(new Vector2(getVelocity().x, 0));
 		}
 		
 		// X-axis
 		if (position.x < 0)
 		{
 			position.x = 0;
+			setVelocity(new Vector2(0, getVelocity().y));
 		}
 		else if (level != null && position.x > level.getWidth() - getHitbox().width)
 		{
 			position.x = level.getWidth() - getHitbox().width;
+			setVelocity(new Vector2(0, getVelocity().y));
 		}
 		
 		super.setPosition(position);
@@ -99,6 +121,11 @@ public abstract class Unit extends PhysicsEntity
 	
 	public void setVelocity(Vector2 velocity) 
 	{
+		if (velocity.x > VELOCITY_MAX.x) velocity.x = VELOCITY_MAX.x;
+		if (-velocity.x > VELOCITY_MAX.x) velocity.x = -VELOCITY_MAX.x;
+		if (velocity.y > VELOCITY_MAX.y) velocity.y = VELOCITY_MAX.y;
+		if (-velocity.y > VELOCITY_MAX.y) velocity.y = -VELOCITY_MAX.y;
+		
 		if (direction != null)
 		{
 			if (velocity.x > 0) direction.x = 1;
@@ -107,6 +134,7 @@ public abstract class Unit extends PhysicsEntity
 			
 			if (velocity.y > 0) direction.y = 1;
 			else if (velocity.y < 0) direction.y = -1;
+			else direction.y = 0;
 		}
 		
 		super.setVelocity(velocity);

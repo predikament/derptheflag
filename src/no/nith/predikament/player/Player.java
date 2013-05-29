@@ -2,42 +2,40 @@ package no.nith.predikament.player;
 
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.PhysicsEntity;
+import no.nith.predikament.level.Level;
 import no.nith.predikament.util.Vector2;
 
 public class Player 
 {
-	@SuppressWarnings("unused")
-	private static final Vector2 DECELERATION_FACTOR = new Vector2(1, 1);
-	public static final Vector2 JUMP_VECTOR = new Vector2(0, 300);
-	public static final double VELOCITY_MAX = 200;
-	private static final double SPEED = 20;
-	private PhysicsEntity target;
-	private boolean jumping;
+	private static final double SPEED_INCREMENT = 1;
+	private static final Vector2 JUMP_VECTOR = new Vector2(0, -150);
 	
-	public Player(PhysicsEntity target)
+	private Level level;
+	private PhysicsEntity target;
+	
+	public Player(Level level, PhysicsEntity target)
 	{
+		this.level = level;
 		this.target = target;
-		
-		jumping = false;
 	}
 	
 	public void moveLeft()
 	{
 		Vector2 vel = target.getVelocity();
-		vel.x -= SPEED;
+		vel.x -= SPEED_INCREMENT;
 	}
 	
 	public void moveRight()
 	{
 		Vector2 vel = target.getVelocity();
-		vel.x += SPEED;
+		vel.x += SPEED_INCREMENT;
 	}
 	
 	public void jump()
 	{
-		if (!jumping)
+		if (target.getHitbox().getMaxY() == level.getHeight())
 		{
-			
+			target.setVelocity(Vector2.add(target.getVelocity(), JUMP_VECTOR));
 		}
 	}
 	
@@ -48,10 +46,6 @@ public class Player
 	
 	public void update(double dt)
 	{
-		// Vector2 vel = target.getVelocity();
-		// vel.x *= DECELERATION_FACTOR.x;
-		// vel.y *= DECELERATION_FACTOR.y;
-		
 		target.update(dt);
 	}
 	

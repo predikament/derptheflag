@@ -10,7 +10,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import no.nith.predikament.entity.unit.Unit;
 import no.nith.predikament.level.Level;
@@ -24,14 +27,13 @@ public class Game extends Canvas implements Runnable
 	
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
-	public static final int SCALE	= 4;
+	public static final int SCALE	= 3;
 	
 	private boolean keepRunning;
 	
 	private BufferedImage screenImage;
 	private Bitmap screenBitmap;
 	
-	@SuppressWarnings("unused")
 	private InputHandler inputHandler;
 	
 	private int currentFrameCount;
@@ -80,9 +82,10 @@ public class Game extends Canvas implements Runnable
 		keepRunning = false;
 	}
 	
-	private void update(double deltaTime)
+	private void update(double dt)
 	{
-		level.update(deltaTime);
+		inputHandler.update(dt);
+		level.update(dt);
 	}
 	
 	private void render(Bitmap screen)
@@ -159,10 +162,14 @@ public class Game extends Canvas implements Runnable
 	private class InputHandler implements KeyListener, MouseListener
 	{
 		private final Game game;
+		private final Set<Integer> pressedKeys;
+		private final Set<Integer> releasedKeys;
 		
 		public InputHandler(Game game)
 		{
 			this.game = game;
+			pressedKeys = Collections.synchronizedSet(new HashSet<Integer>());
+			releasedKeys = Collections.synchronizedSet(new HashSet<Integer>());
 			
 			game.addKeyListener(this);
 			game.addMouseListener(this);
@@ -204,57 +211,64 @@ public class Game extends Canvas implements Runnable
 		}
 
 		// Keyboard
-		public void keyPressed(KeyEvent event) 
+		public synchronized void keyPressed(KeyEvent event) 
 		{
 			int keycode = event.getKeyCode();
 			
-			switch (keycode)
-			{
-				case KeyEvent.VK_LEFT:
-					level.getPlayer().moveLeft();
-					break;
-					
-				case KeyEvent.VK_RIGHT:
-					level.getPlayer().moveRight();
-					break;
-					
-				case KeyEvent.VK_UP:
-					break;
-				
-				case KeyEvent.VK_DOWN:
-					break;
-					
-				case KeyEvent.VK_SPACE:
-					level.getPlayer().jump();
-					break;
-				
-				case KeyEvent.VK_ESCAPE:
-					game.stop();
-					break;
-					
-				default:
-					break;
-			}
+			if (pressedKeys.contains(keycode) == false) pressedKeys.add(keycode);
 		}
 
-		public void keyReleased(KeyEvent event) 
+		public synchronized void keyReleased(KeyEvent event) 
 		{
+			int keycode = event.getKeyCode();
 			
+			if (releasedKeys.contains(keycode) == false) releasedKeys.add(keycode);
 		}
 
 		public void keyTyped(KeyEvent event) 
 		{
-			int keycode = event.getKeyCode();
-			
-			switch (keycode)
+		}
+		
+		private void update(double dt)
+		{
+			for (int keycode : pressedKeys)
 			{
-				case KeyEvent.VK_F10:
-					displayFPS = !displayFPS;
-					break;
-
-				default:
-					break;
+				switch(keycode)
+				{
+					case KeyEvent.VK_LEFT:
+						level.getPlayer().moveLeft();
+						break;
+						
+					case KeyEvent.VK_RIGHT:
+						level.getPlayer().moveRight();
+						break;
+						
+					case KeyEvent.VK_UP:
+						break;
+					
+					case KeyEvent.VK_DOWN:
+						break;
+						
+					case KeyEvent.VK_SPACE:
+						level.getPlayer().jump();
+						break;
+					
+					case KeyEvent.VK_ESCAPE:
+						game.stop();
+						break;
+						
+					case KeyEvent.VK_F10:
+						displayFPS = !displayFPS;
+						break;
+					
+					default:
+						break;
+				}
 			}
+			
+			pressedKeys.removeAll(releasedKeys);
+			
+			if (releasedKeys.size() > 0) releasedKeys.clear();
 		}
 	}
 }

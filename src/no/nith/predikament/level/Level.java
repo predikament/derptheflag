@@ -13,9 +13,8 @@ import no.nith.predikament.util.Vector2;
 
 public class Level 
 {
-	public final double friction = 0.98;
-	public Vector2 GRAVITY = new Vector2(0, 0.5);
-	public final Vector2 FRICTION = new Vector2(0.999, 1);
+	public Vector2 GRAVITY = new Vector2(0, 0.20);
+	public final Vector2 FRICTION = new Vector2(0.992, 1);
 	private final Random random = new Random();
 	private Player player;
 	private final int width;
@@ -28,6 +27,11 @@ public class Level
 		this.width = width;
 		this.height = height;
 		
+		entities = Collections.synchronizedList(new ArrayList<Entity>());
+	}
+	
+	public void init()
+	{
 		// Generate random player unit
 		Unit unit = Unit.create(this, random.nextInt(Unit.TOTAL_UNITS));
 		
@@ -36,14 +40,11 @@ public class Level
 											(getHeight() - unit.getHitbox().getHeight()) / 2.0);
 		unit.setPosition(unitPosition);
 		
-		player = new Player(unit);
+		player = new Player(this, unit);
 		
-		entities = Collections.synchronizedList(new ArrayList<Entity>());
-	}
-	
-	public void init()
-	{
 		entities.clear();
+
+		entities.add(player.getTarget());
 	}
 	
 	public synchronized void addEntity(Entity entity)
@@ -53,20 +54,27 @@ public class Level
 	
 	public synchronized void update(double dt)
 	{
-		player.update(dt);
-		
 		for (Entity e : entities)
 		{
 			if (e.wasRemoved() == false)
 			{
 				if (e instanceof PhysicsEntity)
 				{
-					// Apply level gravity here somewhere
-					@SuppressWarnings("unused")
+					// Apply gravity
 					PhysicsEntity p = (PhysicsEntity) e;
+					Vector2 vel = p.getVelocity();
+					vel.x += GRAVITY.x;
+					vel.y += GRAVITY.y;
+
+					// Apply friction
+					vel.x *= FRICTION.x;
+					vel.y *= FRICTION.y;
+					
+					p.setVelocity(vel);
+					
+					p.update(dt);
 				}
-				
-				e.update(dt);
+				else e.update(dt);
 			}
 			else entities.remove(e);
 		}
@@ -76,10 +84,14 @@ public class Level
 	{
 		for (Entity e : entities)
 		{
-			if (e.wasRemoved() == false) e.render(screen);
+			if (e.wasRemoved() == false)
+			{
+				if (player != null && e.equals(player.getTarget()) == false) e.render(screen);
+			}
 		}
 		
-		player.render(screen);
+		// Render the player last
+		if (player != null) player.render(screen);
 	}
 
 	public int getWidth() 

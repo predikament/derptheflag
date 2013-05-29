@@ -62,7 +62,13 @@ public abstract class PhysicsEntity extends Entity
 	
 	public void update(double dt)
 	{
+		Vector2 pos = new Vector2();
+		Vector2 vel = getVelocity();
 		
+		// Calculate new position from current velocity
+		pos = Vector2.add(getPosition(), new Vector2(vel.x * dt, vel.y * dt));
+		
+		setPosition(pos);
 	}
 	
 	public Vector2 getVelocity() 
@@ -72,6 +78,10 @@ public abstract class PhysicsEntity extends Entity
 	
 	public void setVelocity(Vector2 velocity) 
 	{
+		// Clip velocity at low values to avoid stuttering		
+		if (velocity.x <= 0.1 && velocity.x >= -0.1) velocity.x = 0;
+		if (velocity.y <= 0.1 && velocity.y >= -0.1) velocity.y = 0;
+		
 		this.velocity = velocity;
 	}
 	

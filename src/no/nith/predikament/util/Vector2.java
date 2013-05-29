@@ -15,6 +15,11 @@ public class Vector2
 		this.y = y;
 	}
 	
+	public String toString()
+	{
+		return String.format("X = %f, Y = %f", x, y); 
+	}
+	
 	public static Vector2 add(Vector2 u, Vector2 v)
 	{
 		Vector2 result = new Vector2();
