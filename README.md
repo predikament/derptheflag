@@ -1,4 +1,4 @@
 derptheflag
 ===========
 
-yup.
+README READS YOU.
