@@ -4,9 +4,6 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.PointerInfo;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -16,17 +13,13 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
-import no.nith.predikament.entity.unit.Unit;
 import no.nith.predikament.level.Level;
+import no.nith.predikament.util.Vector2;
 
 public class Game extends Canvas implements Runnable
 {
-	private final Random random = new Random();
-	
 	private static final long serialVersionUID = 1L;
-	
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
 	public static final int SCALE	= 3;
@@ -172,19 +165,24 @@ public class Game extends Canvas implements Runnable
 			
 			game.addKeyListener(this);
 			game.addMouseListener(this);
+			game.addMouseMotionListener(this);
 		}
 		
 		// MouseListener
 		public synchronized void mousePressed(MouseEvent event) 
 		{	
-			Unit unit = Unit.create(game.level, random.nextInt(Unit.TOTAL_UNITS));
+			/*Unit unit = Unit.create(game.level, random.nextInt(Unit.TOTAL_UNITS));*/
 			
-			double mouseX = (event.getX() / SCALE) - (unit.getHitbox().getWidth() / 2);
-			double mouseY = (event.getY() / SCALE) - (unit.getHitbox().getHeight() / 2);
+			/*Pet dog = new Dog(level, level.getPlayer().getTarget());
 			
-			unit.setPosition(mouseX, mouseY);
+			dog.setPosition(mouseX, mouseY);
 						
-			level.addEntity(unit);
+			level.addEntity(dog);*/
+			
+			double mouseX = (event.getX() / SCALE);
+			double mouseY = (event.getY() / SCALE);
+			
+			level.getPlayer().shoot(new Vector2(mouseX, mouseY));
 		}
 		
 		public synchronized void mouseReleased(MouseEvent event) 
@@ -215,7 +213,15 @@ public class Game extends Canvas implements Runnable
 
 		public synchronized void mouseMoved(MouseEvent event) 
 		{
+			/*double mouseX = (event.getX() / SCALE);
+			double mouseY = (event.getY() / SCALE);
 			
+			Vector2 mousePos = new Vector2(mouseX, mouseY);
+			
+			System.out.println("Cross product: " + mousePos.cross(game.level.getPlayer().getTarget().getPosition()));
+			System.out.println("Dot product: " + mousePos.dot(game.level.getPlayer().getTarget().getPosition()));
+			System.out.println("Distance: " + mousePos.distanceTo(game.level.getPlayer().getTarget().getPosition()));
+			System.out.println("Angle: " + Math.toDegrees(Math.acos(mousePos.normalized().dot(game.level.getPlayer().getTarget().getPosition().normalized()))));*/
 		}
 
 		// KeyListener

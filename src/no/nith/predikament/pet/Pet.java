@@ -8,19 +8,31 @@ import no.nith.predikament.util.Vector2;
 
 public class Pet extends PhysicsEntity 
 {
+	/*private static final Color CHANGEABLE_COLOR = Color.MAGENTA;
+	private static final Color[] CHOICES =
+		{
+			Color.BLACK,
+			Color.DARK_GRAY,
+			Color.YELLOW,
+			Color.ORANGE,
+			Color.PINK,
+			Color.RED,
+			Color.LIGHT_GRAY
+		};
+	private final Color color;*/
 	private Level level;
-	private PhysicsEntity target;
+	private PhysicsEntity owner;
 	private int ySpriteIndex;
 	private double follow_range;
-	private Vector2 direction;
-	private int frame;
+	protected Vector2 direction;
+	protected int frame;
 	
-	public Pet(Level level, PhysicsEntity target, int ySpriteIndex)
+	public Pet(Level level, PhysicsEntity owner, int ySpriteIndex)
 	{
 		super(0, 0, 16, 16);
 		
 		this.level = level;
-		this.target = target;
+		this.owner = owner;
 		this.ySpriteIndex = ySpriteIndex;
 		
 		setFollowRange(5.0);
@@ -31,12 +43,16 @@ public class Pet extends PhysicsEntity
 
 	public void update(double dt) 
 	{
-		if (Vector2.distanceBetween(getPosition(), getTarget().getPosition()) > getFollowRange())
+		// Keeps within follow_range pixels on the X-axis from target
+		Vector2 pNullY = new Vector2(getPosition().x, 0);
+		Vector2 oNullY = new Vector2(owner.getPosition().x, 0);
+		
+		if (Vector2.distanceBetween(pNullY, oNullY) > getFollowRange())
 		{
 			Vector2 vel = getVelocity();
 			
-			if (getPosition().x < getTarget().getPosition().x) vel.x += 0.8;
-			else if (getPosition().x > getTarget().getPosition().x) vel.x -= 0.8;
+			if (getPosition().x < getOwner().getPosition().x) vel.x += 0.8;
+			else if (getPosition().x > getOwner().getPosition().x) vel.x -= 0.8;
 		}
 		
 		super.update(dt);
@@ -46,13 +62,23 @@ public class Pet extends PhysicsEntity
 	{
 		boolean flip = false;
 		
-		if (direction.x == 0) frame = 0;
-		else
+		if (direction.x == 0)
+		{
+			frame = 0;
+		}
+		else if (direction.x == 1)
+		{
+			frame = 1;
+		}
+		else if (direction.x == -1)
 		{
 			frame = 1;
 			
-			if (direction.x == -1) flip = true;
+			flip = true;
 		}
+		
+		if (direction.y == 1) frame = 2;
+		else if (direction.y == -1) frame = 2;
 
 		screen.draw(Art.instance.pets[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
 	}
@@ -93,19 +119,23 @@ public class Pet extends PhysicsEntity
 			if (velocity.x < 0) direction.x = -1;
 			else if (velocity.x > 0) direction.x = 1;
 			else direction.x = 0;
+			
+			if (velocity.y > 0) direction.y = 1;
+			else if (velocity.y < 0) direction.y = -1;
+			else direction.y = 0;
 		}
 		
 		super.setVelocity(velocity);
 	}
 	
-	public PhysicsEntity getTarget() 
+	public PhysicsEntity getOwner() 
 	{
-		return target;
+		return owner;
 	}
 
-	public void setTarget(PhysicsEntity target) 
+	public void setOwner(PhysicsEntity owner) 
 	{
-		this.target = target;
+		this.owner = owner;
 	}
 
 	public final double getFollowRange()

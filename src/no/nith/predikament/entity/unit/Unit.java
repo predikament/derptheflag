@@ -14,6 +14,9 @@ public abstract class Unit extends PhysicsEntity
 	private Vector2 direction;
 	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 400);
 	public static final int TOTAL_UNITS = 5;
+	@SuppressWarnings("unused")
+	private long thisTime, lastTime;
+	public boolean shooting;
 	
 	public Unit(Level level, int ySpriteIndex)
 	{
@@ -24,6 +27,8 @@ public abstract class Unit extends PhysicsEntity
 		this.direction = new Vector2();
 		
 		frame = 0;
+		shooting = false;
+		lastTime = thisTime = 0;
 	}
 	
 	public static Unit create(Level level, int type)
@@ -56,17 +61,38 @@ public abstract class Unit extends PhysicsEntity
 		return newUnit;
 	}
 	
+	public void update(double dt)
+	{
+		super.update(dt);
+		
+		thisTime = System.currentTimeMillis();
+		
+		if (isShooting() && thisTime - lastTime >= 250) setShooting(false);
+	}
+	
 	public void render(Bitmap screen) 
 	{
 		boolean flip = false;
 		
-		if (direction.x == 0) frame = 0;
-		else frame = 1;
+		if (direction.x == 0)
+		{
+			frame = 0;
+		}
+		else if (direction.x == 1)
+		{
+			frame = 1;
+		}
+		else if (direction.x == -1)
+		{
+			frame = 1;
+			
+			flip = true;
+		}
 		
-		if (direction.x == -1) flip = true;
+		if (direction.y == 1) frame = 4;
+		else if (direction.y == -1) frame = 5;
 		
-		if (direction.x != 0 && direction.y == 1) frame = 4;
-		else if (direction.x != 0 && direction.y == -1) frame = 3;
+		if (isShooting()) frame = 2;
 		
 		screen.draw(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
 	}
@@ -103,8 +129,8 @@ public abstract class Unit extends PhysicsEntity
 	public void setVelocity(Vector2 velocity) 
 	{
 		if (velocity.x > VELOCITY_MAX.x) velocity.x = VELOCITY_MAX.x;
-		if (-velocity.x > VELOCITY_MAX.x) velocity.x = -VELOCITY_MAX.x;
 		if (velocity.y > VELOCITY_MAX.y) velocity.y = VELOCITY_MAX.y;
+		if (-velocity.x > VELOCITY_MAX.x) velocity.x = -VELOCITY_MAX.x;
 		if (-velocity.y > VELOCITY_MAX.y) velocity.y = -VELOCITY_MAX.y;
 		
 		if (direction != null)
@@ -124,5 +150,17 @@ public abstract class Unit extends PhysicsEntity
 	public Level getLevel() 
 	{
 		return level;
+	}
+	
+	public void setShooting(final boolean shooting)
+	{
+		this.shooting = shooting;
+		
+		lastTime = System.currentTimeMillis();
+	}
+	
+	public final boolean isShooting()
+	{
+		return shooting;
 	}
 }

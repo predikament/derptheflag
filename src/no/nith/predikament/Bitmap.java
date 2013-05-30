@@ -36,10 +36,26 @@ public class Bitmap
 		Arrays.fill(pixels, color);
 	}
 	
+	public void replace(int c0, int c1)
+	{
+		for (int y = 0; y < h; ++y)
+		{
+			for (int x = 0; x < w; ++x)
+			{
+				if (pixels[x + y * w] == c0) pixels[x + y * w] = c1;
+			}
+		}
+	}
+	
+	public void setPixel(double x, double y, int color) 
+	{
+		setPixel((int) x, (int) y, color);
+	}
+	
 	public void setPixel(int x, int y, int color)
 	{
 		if (x >= 0 && x < w && y >= 0 && y < h) pixels[x + y * w] = color;
-	}
+	}	
 	
 	public void fill(int x0, int y0, int x1, int y1, int color)
 	{
@@ -104,5 +120,5 @@ public class Bitmap
 				}
 			}
 		}
-	}	
+	}
 }
