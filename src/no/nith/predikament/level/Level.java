@@ -5,13 +5,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-
 import no.nith.predikament.Art;
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.Entity;
 import no.nith.predikament.entity.PhysicsEntity;
 import no.nith.predikament.entity.unit.Unit;
-import no.nith.predikament.entity.weapon.Bullet;
 import no.nith.predikament.entity.weapon.Lazer;
 import no.nith.predikament.entity.weapon.Weapon;
 import no.nith.predikament.player.Player;
@@ -20,7 +18,7 @@ import no.nith.predikament.util.Vector2;
 public class Level 
 {
 	private final Random random = new Random();
-	public Vector2 GRAVITY = new Vector2(0, 0.60);
+	public Vector2 GRAVITY = new Vector2(0, 0.95);
 	public final Vector2 FRICTION = new Vector2(0.991, 1);
 	private Player player;
 	private final int width;
@@ -106,29 +104,6 @@ public class Level
 					
 					p.update(dt);
 					
-					if (p instanceof Unit)
-					{
-						Unit pu = (Unit) p;
-						Entity eu = pu;
-						
-						while (eu.equals(pu)) eu = entities.get(random.nextInt(entities.size()));
-						
-						pu.lookAt(entities.get(random.nextInt(entities.size())).getPosition());
-						
-						int rand = random.nextInt(2000);
-						
-						if (rand <= 10)
-						{
-							if (rand == 10) particles.clear();
-							else if (rand < 2)
-							{
-								if (pu.getPosition().x < eu.getPosition().x) pu.setVelocity(Vector2.add(pu.getVelocity(), new Vector2(2000, 0)));
-								else if (pu.getPosition().x > eu.getPosition().x) pu.setVelocity(Vector2.add(pu.getVelocity(), new Vector2(-2000, 0)));
-							}
-							else pu.shoot();
-						}
-					}
-					
 					Iterator<Weapon> b = bullets.iterator();
 					
 					while (b.hasNext())
@@ -177,7 +152,7 @@ public class Level
 			{
 				w.update(dt);
 				
-				if (w.getPosition().x < -1000) w.remove();
+				if (Math.abs(w.getPosition().x) > 1000 || Math.abs(w.getPosition().y) > 1000) w.remove();
 			}
 			else p.remove();
 		}
@@ -188,23 +163,9 @@ public class Level
 		// Render level background
 		screen.draw(Art.instance.background[0][0], 0, 0);
 		
-		for (Entity e : entities)
-		{
-			if (e.wasRemoved() == false)
-			{
-				e.render(screen);
-			}
-		}
-		
-		for (Weapon w : bullets)
-		{
-			w.render(screen);
-		}
-		
-		for (Weapon p : particles)
-		{
-			p.render(screen);
-		}
+		for (Entity e : entities) if (e.wasRemoved() == false) e.render(screen);
+		for (Weapon w : bullets) if (w.wasRemoved() == false) w.render(screen);
+		for (Weapon p : particles) if (p.wasRemoved() == false) p.render(screen);
 		
 		// Render the player last
 		if (player != null) player.render(screen);

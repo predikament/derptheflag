@@ -3,7 +3,7 @@ package no.nith.predikament.entity.unit;
 import no.nith.predikament.Art;
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.PhysicsEntity;
-import no.nith.predikament.entity.weapon.Lazer;
+import no.nith.predikament.entity.weapon.*;
 import no.nith.predikament.level.Level;
 import no.nith.predikament.util.Stopwatch;
 import no.nith.predikament.util.Vector2;
@@ -14,7 +14,7 @@ public abstract class Unit extends PhysicsEntity
 	private int ySpriteIndex;
 	private int frame;
 	private Vector2 direction;
-	private static final Vector2 JUMP_VECTOR = new Vector2(0, -300);
+	private static final Vector2 JUMP_VECTOR = new Vector2(0, -200);
 	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 400);
 	private static final Vector2 BULLET_OFFSET = new Vector2(8.0f, 0);
 	public static final int TOTAL_UNITS = 5;
@@ -124,7 +124,7 @@ public abstract class Unit extends PhysicsEntity
 		Vector2 difference = new Vector2(mousePos.x - playerPos.x, mousePos.y - playerPos.y);
 		Vector2 angle = Vector2.radianToVector(Math.toRadians(Math.atan2(difference.y, difference.x) * 180 / Math.PI));
 		
-		level.addEntity(new Lazer(playerPos, angle));
+		level.addEntity(new Bullet(playerPos, angle));
 	}
 	
 	public void lookAt(final Vector2 position)
