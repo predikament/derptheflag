@@ -57,6 +57,62 @@ public class Bitmap
 		if (x >= 0 && x < w && y >= 0 && y < h) pixels[x + y * w] = color;
 	}	
 	
+	public void drawLine(double x0, double y0, double x1, double y1, int color)
+	{
+		drawLine((int) x0, (int) y0, (int) x1, (int) y1, color);
+	}
+
+	public void drawLine(int x0, int y0, int x1, int y1, int color)
+	{
+		boolean steep = Math.abs(y1 - y0) > Math.abs(x1 - x0);
+		
+		if (steep)
+		{
+			// Swap X's with Y's
+			int temp = x0;
+			x0 = y0;
+			y0 = temp;
+			temp = x1;
+			x1 = y1;
+			y1 = temp;
+		}
+		if (x0 > x1)
+		{
+			// Swap X's and X's and Y's with Y's
+			int temp = x0;
+			x0 = x1;
+			x1 = temp;
+			temp = y0;
+			y0 = y1;
+			y1 = temp;
+		}
+		
+		int deltaX = x1 - x0;
+		int deltaY = Math.abs(y1 - y0);
+		int error = deltaX / 2;
+		int ystep = 0;
+		int y = y0;
+		if (y0 < y1) ystep = 1;
+		else ystep = -1;
+		
+		for (int x = x0; x < x1; ++x)
+		{
+			if (x >= 0 && x < w && y >= 0 && y < h)
+			{
+				if (steep) setPixel(y, x, color);
+				else setPixel(x, y, color);
+			}
+			
+			error = error - deltaY;
+			
+			if (error < 0)
+			{
+				y = y + ystep;
+				error += deltaX;
+			}
+		}
+	}
+	
 	public void fill(int x0, int y0, int x1, int y1, int color)
 	{
 		if (x0 < 0) x0 = 0;

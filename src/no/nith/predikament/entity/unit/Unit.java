@@ -3,7 +3,9 @@ package no.nith.predikament.entity.unit;
 import no.nith.predikament.Art;
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.PhysicsEntity;
+import no.nith.predikament.entity.weapon.Lazer;
 import no.nith.predikament.level.Level;
+import no.nith.predikament.util.Stopwatch;
 import no.nith.predikament.util.Vector2;
 
 public abstract class Unit extends PhysicsEntity
@@ -12,11 +14,15 @@ public abstract class Unit extends PhysicsEntity
 	private int ySpriteIndex;
 	private int frame;
 	private Vector2 direction;
+	private static final Vector2 JUMP_VECTOR = new Vector2(0, -300);
 	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 400);
+	private static final Vector2 BULLET_OFFSET = new Vector2(8.0f, 0);
 	public static final int TOTAL_UNITS = 5;
-	@SuppressWarnings("unused")
-	private long thisTime, lastTime;
-	public boolean shooting;
+	private boolean running;
+	private boolean jumping;
+	private boolean shooting;
+	private Vector2 lookingAtPosition;
+	private Stopwatch walkTimer, shootTimer;
 	
 	public Unit(Level level, int ySpriteIndex)
 	{
@@ -27,8 +33,14 @@ public abstract class Unit extends PhysicsEntity
 		this.direction = new Vector2();
 		
 		frame = 0;
+		running = false;
+		jumping = false;
 		shooting = false;
-		lastTime = thisTime = 0;
+		
+		lookingAtPosition = new Vector2(0, 0);
+		
+		walkTimer = new Stopwatch();
+		shootTimer = new Stopwatch();
 	}
 	
 	public static Unit create(Level level, int type)
@@ -65,36 +77,77 @@ public abstract class Unit extends PhysicsEntity
 	{
 		super.update(dt);
 		
-		thisTime = System.currentTimeMillis();
+		if (getVelocity().x != 0 && !running) setRunning(true);
+		else if (getVelocity().x == 0) setRunning(false);
 		
-		if (isShooting() && thisTime - lastTime >= 250) setShooting(false);
+		if (jumping && getVelocity().y == 0) jumping = false;
+		
+		if (shooting && shootTimer.getElapsedTime() >= 200)
+		{
+			setShooting(false);
+		}
+		
+		if (running && walkTimer.getElapsedTime() >= 600) walkTimer.reset();
 	}
 	
 	public void render(Bitmap screen) 
 	{
-		boolean flip = false;
+		boolean flip = getVelocity().x < 0;
 		
-		if (direction.x == 0)
-		{
-			frame = 0;
-		}
-		else if (direction.x == 1)
-		{
-			frame = 1;
-		}
-		else if (direction.x == -1)
-		{
-			frame = 1;
-			
-			flip = true;
-		}
+		frame = 0;
 		
-		if (direction.y == 1) frame = 4;
-		else if (direction.y == -1) frame = 5;
-		
-		if (isShooting()) frame = 2;
+		if (shooting)
+		{
+			flip = direction.x == -1;
+			frame = 4;
+		}
+		else if (running)
+		{
+			if (walkTimer.getElapsedTime() < 200) frame = 1;
+			else if (walkTimer.getElapsedTime() < 400) frame = 2; 
+			else frame = 3;
+		}
 		
 		screen.draw(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
+	}
+	
+	public synchronized void shoot()
+	{
+		setShooting(true);
+		
+		Vector2 mousePos = new Vector2(lookingAtPosition);
+		Vector2 playerPos = new Vector2(getHitbox().getCenterX(), getHitbox().getCenterY());
+		
+		if (direction.x == -1) playerPos.x -= BULLET_OFFSET.x;
+		else if (direction.x == 1) playerPos.x += BULLET_OFFSET.x;
+
+		Vector2 difference = new Vector2(mousePos.x - playerPos.x, mousePos.y - playerPos.y);
+		Vector2 angle = Vector2.radianToVector(Math.toRadians(Math.atan2(difference.y, difference.x) * 180 / Math.PI));
+		
+		level.addEntity(new Lazer(playerPos, angle));
+	}
+	
+	public void lookAt(final Vector2 position)
+	{
+		lookingAtPosition = new Vector2(position);
+		
+		if (lookingAtPosition.x <= getHitbox().getCenterX()) direction.x = -1;
+		else if (lookingAtPosition.x > getHitbox().getCenterX()) direction.x = 1;
+		else direction.x = 0;
+		
+		if (lookingAtPosition.y <= getHitbox().getCenterY()) direction.y = -1;
+		else if (lookingAtPosition.y > getHitbox().getCenterY()) direction.y = 1;
+		else direction.y = 0;
+	}
+	
+	public void jump()
+	{
+		if (!jumping)
+		{
+			setVelocity(Vector2.add(getVelocity(), JUMP_VECTOR));
+			
+			jumping = true;
+		}
 	}
 	
 	public void setPosition(Vector2 position)
@@ -133,17 +186,6 @@ public abstract class Unit extends PhysicsEntity
 		if (-velocity.x > VELOCITY_MAX.x) velocity.x = -VELOCITY_MAX.x;
 		if (-velocity.y > VELOCITY_MAX.y) velocity.y = -VELOCITY_MAX.y;
 		
-		if (direction != null)
-		{
-			if (velocity.x > 0) direction.x = 1;
-			else if (velocity.x < 0) direction.x = -1;
-			else direction.x = 0;
-			
-			if (velocity.y > 0) direction.y = 1;
-			else if (velocity.y < 0) direction.y = -1;
-			else direction.y = 0;
-		}
-		
 		super.setVelocity(velocity);
 	}
 
@@ -152,15 +194,27 @@ public abstract class Unit extends PhysicsEntity
 		return level;
 	}
 	
-	public void setShooting(final boolean shooting)
+	private void setRunning(final boolean running)
+	{
+		this.running = running;
+		
+		if (running) walkTimer.start();
+		else 
+		{
+			walkTimer.stop();
+			walkTimer.reset();
+		}
+	}
+	
+	private void setShooting(final boolean shooting)
 	{
 		this.shooting = shooting;
 		
-		lastTime = System.currentTimeMillis();
-	}
-	
-	public final boolean isShooting()
-	{
-		return shooting;
+		if (shooting) shootTimer.start();
+		else 
+		{
+			shootTimer.stop();
+			shootTimer.reset();
+		}
 	}
 }

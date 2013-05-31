@@ -34,12 +34,12 @@ public class Vector2
 	
 	public static Vector2 add(Vector2 u, Vector2 v)
 	{
-		Vector2 result = new Vector2();
-		
-		result.x = u.x + v.x;
-		result.y = u.y + v.y;
-		
-		return result;
+		return new Vector2(u.x + v.x, u.y + v.y);
+	}
+	
+	public void add(final Vector2 u)
+	{
+		add(this, u);
 	}
 	
 	public static double distanceBetween(final Vector2 u, final Vector2 v)

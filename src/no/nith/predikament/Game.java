@@ -14,7 +14,10 @@ import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import no.nith.predikament.entity.unit.Unit;
 import no.nith.predikament.level.Level;
+import no.nith.predikament.util.Stopwatch;
 import no.nith.predikament.util.Vector2;
 
 public class Game extends Canvas implements Runnable
@@ -166,23 +169,14 @@ public class Game extends Canvas implements Runnable
 			game.addKeyListener(this);
 			game.addMouseListener(this);
 			game.addMouseMotionListener(this);
+			
+			new Stopwatch(true);
 		}
 		
 		// MouseListener
 		public synchronized void mousePressed(MouseEvent event) 
 		{	
-			/*Unit unit = Unit.create(game.level, random.nextInt(Unit.TOTAL_UNITS));*/
-			
-			/*Pet dog = new Dog(level, level.getPlayer().getTarget());
-			
-			dog.setPosition(mouseX, mouseY);
-						
-			level.addEntity(dog);*/
-			
-			double mouseX = (event.getX() / SCALE);
-			double mouseY = (event.getY() / SCALE);
-			
-			level.getPlayer().shoot(new Vector2(mouseX, mouseY));
+			((Unit)level.getPlayer().getTarget()).shoot();
 		}
 		
 		public synchronized void mouseReleased(MouseEvent event) 
@@ -197,12 +191,36 @@ public class Game extends Canvas implements Runnable
 
 		public synchronized void mouseEntered(MouseEvent event) 
 		{
-			
+			try
+			{
+				double mouseX = (event.getX() / SCALE);
+				double mouseY = (event.getY() / SCALE);
+				
+				Vector2 mousePos = new Vector2(mouseX, mouseY);
+				
+				((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
+			}
+			catch (Exception e)
+			{
+				// Do nothing here, just eat up the exception
+			}
 		}
 
 		public synchronized void mouseExited(MouseEvent event) 
 		{
-		
+			try
+			{
+				double mouseX = (event.getX() / SCALE);
+				double mouseY = (event.getY() / SCALE);
+				
+				Vector2 mousePos = new Vector2(mouseX, mouseY);
+				
+				((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
+			}
+			catch (Exception e)
+			{
+				// Do nothing here, just eat up the exception
+			}
 		}
 		
 		// MouseMotionListener
@@ -213,15 +231,19 @@ public class Game extends Canvas implements Runnable
 
 		public synchronized void mouseMoved(MouseEvent event) 
 		{
-			/*double mouseX = (event.getX() / SCALE);
-			double mouseY = (event.getY() / SCALE);
-			
-			Vector2 mousePos = new Vector2(mouseX, mouseY);
-			
-			System.out.println("Cross product: " + mousePos.cross(game.level.getPlayer().getTarget().getPosition()));
-			System.out.println("Dot product: " + mousePos.dot(game.level.getPlayer().getTarget().getPosition()));
-			System.out.println("Distance: " + mousePos.distanceTo(game.level.getPlayer().getTarget().getPosition()));
-			System.out.println("Angle: " + Math.toDegrees(Math.acos(mousePos.normalized().dot(game.level.getPlayer().getTarget().getPosition().normalized()))));*/
+			try
+			{
+				double mouseX = (event.getX() / SCALE);
+				double mouseY = (event.getY() / SCALE);
+				
+				Vector2 mousePos = new Vector2(mouseX, mouseY);
+				
+				((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
+			}
+			catch (Exception e)
+			{
+				// Do nothing here, just eat up the exception
+			}
 		}
 
 		// KeyListener
@@ -250,10 +272,12 @@ public class Game extends Canvas implements Runnable
 				switch(keycode)
 				{
 					case KeyEvent.VK_LEFT:
+					case KeyEvent.VK_A:
 						level.getPlayer().moveLeft();
 						break;
 						
 					case KeyEvent.VK_RIGHT:
+					case KeyEvent.VK_D:
 						level.getPlayer().moveRight();
 						break;
 						
@@ -264,7 +288,7 @@ public class Game extends Canvas implements Runnable
 						break;
 						
 					case KeyEvent.VK_SPACE:
-						level.getPlayer().jump();
+						((Unit)level.getPlayer().getTarget()).jump();
 						break;
 					
 					case KeyEvent.VK_ESCAPE:

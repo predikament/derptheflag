@@ -1,13 +1,13 @@
-package no.nith.predikament.entity;
+package no.nith.predikament.entity.weapon;
 
 import java.awt.Color;
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.util.Vector2;
 
-public class Bullet extends PhysicsEntity 
+public class Bullet extends Weapon 
 {
 	private static final Color color = Color.black;
-	private static final Vector2 SPEED = new Vector2(500, 500);
+	private static final Vector2 SPEED = new Vector2(750, 750);
 	
 	public Bullet(Vector2 position, Vector2 velocity)
 	{
