@@ -7,12 +7,11 @@ import java.util.List;
 import java.util.Random;
 import no.nith.predikament.Art;
 import no.nith.predikament.Bitmap;
-import no.nith.predikament.entity.Entity;
-import no.nith.predikament.entity.PhysicsEntity;
-import no.nith.predikament.entity.unit.Unit;
-import no.nith.predikament.entity.weapon.Lazer;
-import no.nith.predikament.entity.weapon.Weapon;
 import no.nith.predikament.player.Player;
+import no.nith.predikament.entity.*;
+import no.nith.predikament.entity.unit.*;
+import no.nith.predikament.entity.weapon.*;
+import no.nith.predikament.entity.particle.*;
 import no.nith.predikament.util.Vector2;
 
 public class Level 
@@ -26,7 +25,7 @@ public class Level
 	
 	private List<Entity> entities;
 	private List<Weapon> bullets;
-	private List<Weapon> particles;
+	private List<Particle> particles;
 	
 	public Level(int width, int height)
 	{
@@ -35,7 +34,7 @@ public class Level
 		
 		entities = Collections.synchronizedList(new ArrayList<Entity>());
 		bullets = Collections.synchronizedList(new ArrayList<Weapon>());
-		particles = Collections.synchronizedList(new ArrayList<Weapon>());
+		particles = Collections.synchronizedList(new ArrayList<Particle>());
 	}
 	
 	public void init()
@@ -51,11 +50,11 @@ public class Level
 		player = new Player(this, unit);
 		
 		entities.clear();
+		bullets.clear();
+		particles.clear();
 
+		if (player.hasTarget()) addEntity(player.getTarget());
 		if (player.hasPet()) addEntity(player.getPet());
-		
-		// Testing
-		for (int x = 0; x < 3; ++x) addEntity(Unit.create(this, random.nextInt(Unit.TOTAL_UNITS)));
 	}
 	
 	public synchronized void addEntity(Entity entity)
@@ -63,98 +62,95 @@ public class Level
 		if (entity != null)
 		{
 			if (entity instanceof Weapon) bullets.add((Weapon) entity);
+			else if (entity instanceof Particle) particles.add((Particle) entity);
 			else entities.add(entity);
 		}
 	}
 	
 	public synchronized void update(double dt)
 	{
-		// Apply gravity to player's entity
-		PhysicsEntity playerEntity = (PhysicsEntity) player.getTarget();
-		Vector2 p_vel = playerEntity.getVelocity();
-		p_vel.x += GRAVITY.x;
-		p_vel.y += GRAVITY.y;
-
-		// Apply friction to player's entity
-		p_vel.x *= FRICTION.x;
-		p_vel.y *= FRICTION.y;
+		// Update bullets
+		Iterator<Weapon> buls = bullets.iterator();
 		
-		// Update player
-		player.update(dt);
-		
-		Iterator<Entity> ei = entities.iterator();
-		
-		while (ei.hasNext())
+		while (buls.hasNext())
 		{
-			Entity e = ei.next();
+			Weapon w = buls.next();
+			
+			if (w.wasRemoved() == false) w.update(dt);
+			else buls.remove();
+		}
+		
+		// Update entities
+		Iterator<Entity> ents = entities.iterator();
+		
+		while (ents.hasNext())
+		{
+			Entity e = ents.next();
 			
 			if (e.wasRemoved() == false)
 			{
+				// If current entity is a PhysicsEntity we apply gravity and friction
 				if (e instanceof PhysicsEntity)
 				{
-					// Apply gravity to the rest of the entities
 					PhysicsEntity p = (PhysicsEntity) e;
 					Vector2 pe_vel = p.getVelocity();
+
 					pe_vel.x += GRAVITY.x;
 					pe_vel.y += GRAVITY.y;
-
-					// Apply friction to the rest of the entities
 					pe_vel.x *= FRICTION.x;
 					pe_vel.y *= FRICTION.y;
 					
 					p.update(dt);
 					
-					Iterator<Weapon> b = bullets.iterator();
+					// Check for collision between entity and bullet
+					buls = bullets.iterator();
 					
-					while (b.hasNext())
+					while (buls.hasNext())
 					{
-						Weapon w = b.next();
+						Weapon w = buls.next();
 						
 						if (w.wasRemoved() == false)
 						{
-							w.update(dt);
-							
-							boolean hasCollision = w.getHitbox().intersects(p.getHitbox());
-							
-							if (hasCollision)
+							boolean collide = p.getHitbox().intersects(w.getHitbox());
+														
+							if (collide)
 							{
-								for (int i = 0; i < 15; ++i)
+								Vector2 particle_pos = new Vector2(p.getHitbox().getCenterX(), p.getHitbox().getCenterY());
+								
+								for (int x = 0; x < 5; ++x)
 								{
-									double rxVel = (random.nextInt(200) - 100) * 0.001;
-									double ryVel = (random.nextInt(200) - 100) * 0.001;
-									if (random.nextDouble() >= 0.5) rxVel *= -1;
-									if (random.nextDouble() >= 0.5) ryVel *= -1;
+									Vector2 particle_vel = new Vector2(w.getVelocity());
+									particle_vel.y += random.nextInt(500) - 500;
 									
-									Vector2 particle_vel = new Vector2(rxVel, ryVel);
-									
-									particles.add(new Lazer(w.getPosition(), particle_vel));
+									addEntity(new BloodParticle(particle_pos, particle_vel, 1));
 								}
 								
 								w.remove();
 							}
-							if (w.getPosition().x < -1000 || w.getPosition().x > 1000) w.remove();
 						}
-						else b.remove();
 					}
 				}
 				else e.update(dt);
 			}
-			else ei.remove();
+			else ents.remove();
 		}
 		
-		Iterator<Weapon> p = particles.iterator();
+		// Update particles
+		Iterator<Particle> pars = particles.iterator();
 		
-		while (p.hasNext())
+		while (pars.hasNext())
 		{
-			Weapon w = p.next();
+			Particle p = pars.next();
 			
-			if (w.wasRemoved() == false)
+			if (p.wasRemoved() == false)
 			{
-				w.update(dt);
-				
-				if (Math.abs(w.getPosition().x) > 1000 || Math.abs(w.getPosition().y) > 1000) w.remove();
+				p.update(dt);
 			}
-			else p.remove();
+			else
+			{
+				System.out.println("Removing particle!");
+				pars.remove();
+			}
 		}
 	}
 	
@@ -163,12 +159,18 @@ public class Level
 		// Render level background
 		screen.draw(Art.instance.background[0][0], 0, 0);
 		
+		// Render entities
 		for (Entity e : entities) if (e.wasRemoved() == false) e.render(screen);
+		// Render bullets
 		for (Weapon w : bullets) if (w.wasRemoved() == false) w.render(screen);
-		for (Weapon p : particles) if (p.wasRemoved() == false) p.render(screen);
+		// Render particles
+		for (Particle p : particles) if (p.wasRemoved() == false) p.render(screen);
+		
+		// Render the pet over all other entities
+		if (player.hasPet()) player.getPet().render(screen);
 		
 		// Render the player last
-		if (player != null) player.render(screen);
+		if (player.hasTarget()) player.getTarget().render(screen);
 	}
 
 	public int getWidth() 

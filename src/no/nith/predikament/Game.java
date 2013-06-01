@@ -14,10 +14,8 @@ import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
 import no.nith.predikament.entity.unit.Unit;
 import no.nith.predikament.level.Level;
-import no.nith.predikament.util.Stopwatch;
 import no.nith.predikament.util.Vector2;
 
 public class Game extends Canvas implements Runnable
@@ -25,7 +23,7 @@ public class Game extends Canvas implements Runnable
 	private static final long serialVersionUID = 1L;
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
-	public static final int SCALE	= 2;
+	public static final int SCALE	= 3;
 	
 	private boolean keepRunning;
 	
@@ -159,6 +157,7 @@ public class Game extends Canvas implements Runnable
 	{
 		private final Game game;
 		private final Set<Integer> pressedKeys;
+		private static final int FIRE_BUTTON = MouseEvent.BUTTON1;
 		
 		public InputHandler(Game game)
 		{
@@ -169,14 +168,20 @@ public class Game extends Canvas implements Runnable
 			game.addKeyListener(this);
 			game.addMouseListener(this);
 			game.addMouseMotionListener(this);
-			
-			new Stopwatch(true);
 		}
 		
 		// MouseListener
 		public synchronized void mousePressed(MouseEvent event) 
 		{	
-			((Unit)level.getPlayer().getTarget()).shoot();
+			switch (event.getButton())
+			{
+				case FIRE_BUTTON:
+					((Unit)level.getPlayer().getTarget()).shoot();
+					break;
+				
+				default:
+					break;
+			}
 		}
 		
 		public synchronized void mouseReleased(MouseEvent event) 
@@ -208,19 +213,7 @@ public class Game extends Canvas implements Runnable
 
 		public synchronized void mouseExited(MouseEvent event) 
 		{
-			try
-			{
-				double mouseX = (event.getX() / SCALE);
-				double mouseY = (event.getY() / SCALE);
-				
-				Vector2 mousePos = new Vector2(mouseX, mouseY);
-				
-				((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
-			}
-			catch (Exception e)
-			{
-				// Do nothing here, just eat up the exception
-			}
+			
 		}
 		
 		// MouseMotionListener
@@ -238,7 +231,7 @@ public class Game extends Canvas implements Runnable
 				
 				Vector2 mousePos = new Vector2(mouseX, mouseY);
 				
-				((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
+				if (level.getPlayer().hasTarget()) ((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
 			}
 			catch (Exception e)
 			{
@@ -269,38 +262,41 @@ public class Game extends Canvas implements Runnable
 		{
 			for (int keycode : pressedKeys)
 			{
-				switch(keycode)
+				if (level.getPlayer().hasTarget())
 				{
-					case KeyEvent.VK_LEFT:
-					case KeyEvent.VK_A:
-						level.getPlayer().moveLeft();
-						break;
+					switch(keycode)
+					{
+						case KeyEvent.VK_LEFT:
+						case KeyEvent.VK_A:
+							level.getPlayer().moveTargetLeft();
+							break;
+							
+						case KeyEvent.VK_RIGHT:
+						case KeyEvent.VK_D:
+							level.getPlayer().moveTargetRight();
+							break;
+							
+						case KeyEvent.VK_UP:
+							break;
 						
-					case KeyEvent.VK_RIGHT:
-					case KeyEvent.VK_D:
-						level.getPlayer().moveRight();
-						break;
+						case KeyEvent.VK_DOWN:
+							break;
+							
+						case KeyEvent.VK_SPACE:
+							((Unit)level.getPlayer().getTarget()).jump();
+							break;
 						
-					case KeyEvent.VK_UP:
-						break;
-					
-					case KeyEvent.VK_DOWN:
-						break;
+						case KeyEvent.VK_ESCAPE:
+							game.stop();
+							break;
+							
+						case KeyEvent.VK_F10:
+							displayFPS = !displayFPS;
+							break;
 						
-					case KeyEvent.VK_SPACE:
-						((Unit)level.getPlayer().getTarget()).jump();
-						break;
-					
-					case KeyEvent.VK_ESCAPE:
-						game.stop();
-						break;
-						
-					case KeyEvent.VK_F10:
-						displayFPS = !displayFPS;
-						break;
-					
-					default:
-						break;
+						default:
+							break;
+					}
 				}
 			}
 		}

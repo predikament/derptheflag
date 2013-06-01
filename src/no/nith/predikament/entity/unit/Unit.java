@@ -14,7 +14,7 @@ public abstract class Unit extends PhysicsEntity
 	private int ySpriteIndex;
 	private int frame;
 	private Vector2 direction;
-	private static final Vector2 JUMP_VECTOR = new Vector2(0, -200);
+	private static final Vector2 JUMP_VECTOR = new Vector2(0, -300);
 	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 400);
 	private static final Vector2 BULLET_OFFSET = new Vector2(8.0f, 0);
 	public static final int TOTAL_UNITS = 5;
@@ -82,7 +82,7 @@ public abstract class Unit extends PhysicsEntity
 		
 		if (jumping && getVelocity().y == 0) jumping = false;
 		
-		if (shooting && shootTimer.getElapsedTime() >= 200)
+		if (shooting && shootTimer.getElapsedTime() >= 100)
 		{
 			setShooting(false);
 		}

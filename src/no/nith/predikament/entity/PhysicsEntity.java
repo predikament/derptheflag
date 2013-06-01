@@ -103,4 +103,9 @@ public abstract class PhysicsEntity extends Entity
 	{
 		this.hitbox = hitbox;  
 	}
+	
+	public void collide(PhysicsEntity p)
+	{
+		// Apply forces from collision with other entity here
+	}
 }

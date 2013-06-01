@@ -1,10 +1,8 @@
 package no.nith.predikament.player;
 
-import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.PhysicsEntity;
+import no.nith.predikament.entity.pet.*;
 import no.nith.predikament.level.Level;
-import no.nith.predikament.pet.Dog;
-import no.nith.predikament.pet.Pet;
 import no.nith.predikament.util.Vector2;
 
 public class Player 
@@ -20,29 +18,24 @@ public class Player
 	{
 		this.level = level;
 		this.target = target;
-		this.pet = new Dog(level, target);
+		this.pet = new Turtle(level, target);
 	}
 	
-	public void moveLeft()
+	public void moveTargetLeft()
 	{
 		Vector2 vel = target.getVelocity();
 		vel.x -= SPEED_INCREMENT;
 	}
 	
-	public void moveRight()
+	public void moveTargetRight()
 	{
 		Vector2 vel = target.getVelocity();
 		vel.x += SPEED_INCREMENT;
 	}
 	
-	public void render(Bitmap screen)
+	public boolean hasTarget()
 	{
-		target.render(screen);
-	}
-	
-	public void update(double dt)
-	{
-		target.update(dt);
+		return target != null;
 	}
 	
 	public boolean hasPet()

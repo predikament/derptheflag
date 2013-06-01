@@ -1,4 +1,4 @@
-package no.nith.predikament.tile;
+package no.nith.predikament.entity.tile;
 
 import no.nith.predikament.Bitmap;
 import no.nith.predikament.entity.PhysicsEntity;
