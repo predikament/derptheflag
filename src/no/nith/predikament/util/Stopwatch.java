@@ -16,7 +16,6 @@ public class Stopwatch
     {
     	this.startTime = 0;
     	this.stopTime = 0;
-    	this.running = running;
     	
     	if (running) start();
     }

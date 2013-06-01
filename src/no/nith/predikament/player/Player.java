@@ -18,7 +18,7 @@ public class Player
 	{
 		this.level = level;
 		this.target = target;
-		this.pet = new Turtle(level, target);
+		this.pet = new Dog(level, target);
 	}
 	
 	public void moveTargetLeft()

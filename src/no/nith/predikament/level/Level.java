@@ -92,15 +92,15 @@ public class Level
 				// If current entity is a PhysicsEntity we apply gravity and friction
 				if (e instanceof PhysicsEntity)
 				{
-					PhysicsEntity p = (PhysicsEntity) e;
-					Vector2 pe_vel = p.getVelocity();
+					PhysicsEntity pe = (PhysicsEntity) e;
+					Vector2 pe_vel = pe.getVelocity();
 
 					pe_vel.x += GRAVITY.x;
 					pe_vel.y += GRAVITY.y;
 					pe_vel.x *= FRICTION.x;
 					pe_vel.y *= FRICTION.y;
 					
-					p.update(dt);
+					pe.update(dt);
 					
 					// Check for collision between entity and bullet
 					buls = bullets.iterator();
@@ -111,18 +111,23 @@ public class Level
 						
 						if (w.wasRemoved() == false)
 						{
-							boolean collide = p.getHitbox().intersects(w.getHitbox());
+							boolean collide = pe.getHitbox().intersects(w.getHitbox());
 														
 							if (collide)
 							{
-								Vector2 particle_pos = new Vector2(p.getHitbox().getCenterX(), p.getHitbox().getCenterY());
+								Vector2 particle_pos = new Vector2();
+								particle_pos.x = w.getPosition().x < pe.getPosition().x ? pe.getHitbox().getMinX() : pe.getPosition().x;
+								particle_pos.y = pe.getHitbox().getCenterY();
 								
-								for (int x = 0; x < 5; ++x)
+								for (int count = 0; count < 10; ++count)
 								{
 									Vector2 particle_vel = new Vector2(w.getVelocity());
 									particle_vel.y += random.nextInt(500) - 500;
+									particle_vel.x *= 0.2;
+									particle_vel.y *= 0.3;
 									
-									addEntity(new BloodParticle(particle_pos, particle_vel, 1));
+									if (count % 3 == 0)	addEntity(new BloodParticle(particle_pos, particle_vel, 500));
+									else addEntity(new MeatParticle(particle_pos, particle_vel, 500));
 								}
 								
 								w.remove();
@@ -144,13 +149,18 @@ public class Level
 			
 			if (p.wasRemoved() == false)
 			{
-				p.update(dt);
+				Vector2 particle_vel = p.getVelocity();
+				particle_vel.x += GRAVITY.x;
+				particle_vel.y += GRAVITY.y * 0.2;
+				
+				((Particle)p).update(dt);
+				
+				if (p.getPosition().y > getHeight()) 
+				{ 
+					p.remove(); 
+				}
 			}
-			else
-			{
-				System.out.println("Removing particle!");
-				pars.remove();
-			}
+			else pars.remove();
 		}
 	}
 	

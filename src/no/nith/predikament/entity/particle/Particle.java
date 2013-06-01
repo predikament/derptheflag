@@ -23,7 +23,6 @@ public class Particle extends PhysicsEntity
 		this.ySpriteIndex = ySpriteIndex;
 		
 		this.lifetime_ms = lifetime_ms;
-		System.out.println("lifetime_ms = " + lifetime_ms);
 		this.lifetimer = new Stopwatch(true);
 	}
 	
