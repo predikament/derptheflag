@@ -7,11 +7,12 @@ import no.nith.predikament.util.Vector2;
 public class Lazer extends Weapon 
 {
 	private static final Color color = Color.red;
-	private static final Vector2 SPEED = new Vector2(750, 750);
-	private int length = 5;
+	private static final double SPEED = 500;
+	private static final int length = 5;
 	
 	public Lazer(Vector2 position, Vector2 velocity)
 	{
+		super(position.x, position.y, length, length);
 		this.setPosition(position);
 		this.setVelocity(velocity);
 	}
@@ -26,8 +27,8 @@ public class Lazer extends Weapon
 	
 	public void setVelocity(Vector2 velocity)
 	{
-		velocity.x *= SPEED.x;
-		velocity.y *= SPEED.y;
+		velocity.x *= SPEED;
+		velocity.y *= SPEED;
 		
 		super.setVelocity(velocity);
 	}

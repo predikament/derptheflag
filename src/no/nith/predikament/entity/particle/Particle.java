@@ -6,7 +6,7 @@ import no.nith.predikament.entity.PhysicsEntity;
 import no.nith.predikament.util.Stopwatch;
 import no.nith.predikament.util.Vector2;
 
-public class Particle extends PhysicsEntity
+public abstract class Particle extends PhysicsEntity
 {
 	private final int xSpriteIndex;
 	private final int ySpriteIndex;

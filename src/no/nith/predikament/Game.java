@@ -23,7 +23,7 @@ public class Game extends Canvas implements Runnable
 	private static final long serialVersionUID = 1L;
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
-	public static final int SCALE	= 3;
+	public static final int SCALE	= 4;
 	
 	private boolean keepRunning;
 	
@@ -176,7 +176,7 @@ public class Game extends Canvas implements Runnable
 			switch (event.getButton())
 			{
 				case FIRE_BUTTON:
-					((Unit)level.getPlayer().getTarget()).shoot();
+					if (level.getPlayer().hasTarget()) ((Unit)level.getPlayer().getTarget()).shoot();
 					break;
 				
 				default:
@@ -262,41 +262,38 @@ public class Game extends Canvas implements Runnable
 		{
 			for (int keycode : pressedKeys)
 			{
-				if (level.getPlayer().hasTarget())
+				switch(keycode)
 				{
-					switch(keycode)
-					{
-						case KeyEvent.VK_LEFT:
-						case KeyEvent.VK_A:
-							level.getPlayer().moveTargetLeft();
-							break;
-							
-						case KeyEvent.VK_RIGHT:
-						case KeyEvent.VK_D:
-							level.getPlayer().moveTargetRight();
-							break;
-							
-						case KeyEvent.VK_UP:
-							break;
+					case KeyEvent.VK_LEFT:
+					case KeyEvent.VK_A:
+						if (level.getPlayer().hasTarget()) level.getPlayer().moveTargetLeft();
+						break;
 						
-						case KeyEvent.VK_DOWN:
-							break;
-							
-						case KeyEvent.VK_SPACE:
-							((Unit)level.getPlayer().getTarget()).jump();
-							break;
+					case KeyEvent.VK_RIGHT:
+					case KeyEvent.VK_D:
+						if (level.getPlayer().hasTarget()) level.getPlayer().moveTargetRight();
+						break;
 						
-						case KeyEvent.VK_ESCAPE:
-							game.stop();
-							break;
-							
-						case KeyEvent.VK_F10:
-							displayFPS = !displayFPS;
-							break;
+					case KeyEvent.VK_UP:
+						break;
+					
+					case KeyEvent.VK_DOWN:
+						break;
 						
-						default:
-							break;
-					}
+					case KeyEvent.VK_SPACE:
+						if (level.getPlayer().hasTarget()) ((Unit)level.getPlayer().getTarget()).jump();
+						break;
+					
+					case KeyEvent.VK_ESCAPE:
+						game.stop();
+						break;
+						
+					case KeyEvent.VK_F10:
+						displayFPS = !displayFPS;
+						break;
+					
+					default:
+						break;
 				}
 			}
 		}

@@ -36,7 +36,7 @@ public class Bitmap
 		Arrays.fill(pixels, color);
 	}
 	
-	public void replace(int c0, int c1)
+	public void replaceColor(int c0, int c1)
 	{
 		for (int y = 0; y < h; ++y)
 		{
@@ -97,11 +97,8 @@ public class Bitmap
 		
 		for (int x = x0; x < x1; ++x)
 		{
-			if (x >= 0 && x < w && y >= 0 && y < h)
-			{
-				if (steep) setPixel(y, x, color);
-				else setPixel(x, y, color);
-			}
+			if (steep) setPixel(y, x, color);
+			else setPixel(x, y, color);
 			
 			error = error - deltaY;
 			
@@ -111,6 +108,48 @@ public class Bitmap
 				error += deltaX;
 			}
 		}
+	}
+	
+	public void drawCircle(double x, double y, int radius, int color)
+	{
+		drawCircle((int) x, (int) y, radius, color);
+	}
+	
+	public void drawCircle(int x, int y, int radius, int color)
+	{
+		int x0 = radius;
+		int y0 = 0;
+		int radiusError = 1-x0;
+		
+		while (x0 >= y0)
+		{
+			setPixel(x0 + x, y0 + y, color);
+			setPixel(y0 + x, x0 + y, color);
+			setPixel(-x0 + x, y0 + y, color);
+			setPixel(-y0 + x, x0 + y, color);
+			setPixel(-x0 + x, -y0 + y, color);
+			setPixel(-y0 + x, -x0 + y, color);
+			setPixel(x0 + x, -y0 + y, color);
+			setPixel(y0 + x, -x0 + y, color);
+			
+			y0++;
+			
+			if (radiusError < 0) radiusError += 2 * y0 + 1;
+			else radiusError += 2 * (y0 - --x0) + 1;
+		}
+	}
+	
+	public void drawSquare(double x0, double y0, double x1, double y1, int color)
+	{
+		drawSquare((int) x0, (int) y0, (int) x1, (int) y1, color);
+	}
+	
+	public void drawSquare(int x0, int y0, int x1, int y1, int color)
+	{
+		drawLine(x0, y0, x1, y0, color);
+		drawLine(x0, y1, x1, y1, color);
+		drawLine(x0, y0, x0, y1, color);
+		drawLine(x1, y0, x1, y1, color);
 	}
 	
 	public void fill(int x0, int y0, int x1, int y1, int color)

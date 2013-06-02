@@ -10,6 +10,7 @@ import no.nith.predikament.util.Vector2;
 
 public class Pet extends PhysicsEntity 
 {
+	public static final int TOTAL_PETS = 3;
 	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 400);
 	private static final Vector2 JUMP_VECTOR = new Vector2(0, -300);
 	private final Random random = new Random();
@@ -43,6 +44,30 @@ public class Pet extends PhysicsEntity
 		nextActionTime = random.nextInt(2500) + 2500;
 	}
 
+	public static Pet create(Level level, PhysicsEntity owner, int type)
+	{
+		Pet pet = null;
+		
+		switch(type)
+		{
+		case 0:
+			pet = new Dog(level, owner);
+			break;
+		case 1:
+			pet = new Cat(level, owner);
+			break;
+		case 2:
+			pet = new Turtle(level, owner);
+			break;
+		default:
+			pet = new Dog(level, owner);
+			System.out.println("Unknown type, generating default.");
+			break;
+		}
+		
+		return pet;
+	}
+	
 	public void update(double dt) 
 	{
 		super.update(dt);

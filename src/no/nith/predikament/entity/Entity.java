@@ -42,4 +42,5 @@ public abstract class Entity
 	
 	public abstract void update(double dt);
 	public abstract void render(Bitmap screen);
+	public abstract void renderHitbox(Bitmap screen);
 }

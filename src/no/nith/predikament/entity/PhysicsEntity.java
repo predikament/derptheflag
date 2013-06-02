@@ -1,8 +1,11 @@
 package no.nith.predikament.entity;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+
+import no.nith.predikament.Bitmap;
 import no.nith.predikament.util.Vector2;
 
 public abstract class PhysicsEntity extends Entity 
@@ -12,7 +15,7 @@ public abstract class PhysicsEntity extends Entity
 	
 	public PhysicsEntity()
 	{
-		this(new Vector2(0, 0), 1, 1);
+		this(Vector2.zero(), 1, 1);
 	}
 	
 	public PhysicsEntity(Vector2 position, int width, int height)
@@ -67,6 +70,11 @@ public abstract class PhysicsEntity extends Entity
 		p.y = (int) getPosition().y;
 		
 		setHitbox(new Rectangle(p, d));
+	}
+	
+	public void renderHitbox(Bitmap screen)
+	{
+		screen.drawSquare(getHitbox().getMinX(), getHitbox().getMinY(), getHitbox().getMaxX(), getHitbox().getMaxY(), Color.black.getRGB());
 	}
 	
 	public void update(double dt)
