@@ -42,6 +42,11 @@ public class Vector2
 		add(this, u);
 	}
 	
+	public static Vector2 multiply(Vector2 u, double scalar)
+	{
+		return new Vector2(u.x * scalar, u.y * scalar);
+	}
+	
 	public static double distanceBetween(final Vector2 u, final Vector2 v)
 	{
 		Vector2 result = new Vector2();

@@ -13,6 +13,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import no.nith.predikament.entity.unit.Unit;
 import no.nith.predikament.level.Level;
@@ -21,6 +22,9 @@ import no.nith.predikament.util.Vector2;
 public class Game extends Canvas implements Runnable
 {
 	private static final long serialVersionUID = 1L;
+	
+	private final Random random = new Random();
+	
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
 	public static final int SCALE	= 4;
@@ -191,19 +195,37 @@ public class Game extends Canvas implements Runnable
 		
 		public synchronized void mouseClicked(MouseEvent event) 
 		{
-			
+			if (level != null && level.getPlayer().hasTarget() == false)
+			{
+				Unit unit = Unit.create(level, random.nextInt(Unit.TOTAL_UNITS));
+				
+				double mouseX = (event.getX() / SCALE);
+				double mouseY = (event.getY() / SCALE);
+				
+				Vector2 mousePos = new Vector2(mouseX, mouseY);
+				
+				mousePos.x -= unit.getHitbox().width / 2.0;
+				mousePos.y -= unit.getHitbox().height / 2.0;
+				
+				unit.setPosition(mousePos);
+				
+				level.getPlayer().setTarget(unit);
+			}
 		}
 
 		public synchronized void mouseEntered(MouseEvent event) 
 		{
 			try
 			{
-				double mouseX = (event.getX() / SCALE);
-				double mouseY = (event.getY() / SCALE);
-				
-				Vector2 mousePos = new Vector2(mouseX, mouseY);
-				
-				((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
+				if (level.getPlayer().hasTarget())
+				{
+					double mouseX = (event.getX() / SCALE);
+					double mouseY = (event.getY() / SCALE);
+					
+					Vector2 mousePos = new Vector2(mouseX, mouseY);
+					
+					((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
+				}
 			}
 			catch (Exception e)
 			{
@@ -226,12 +248,15 @@ public class Game extends Canvas implements Runnable
 		{
 			try
 			{
-				double mouseX = (event.getX() / SCALE);
-				double mouseY = (event.getY() / SCALE);
-				
-				Vector2 mousePos = new Vector2(mouseX, mouseY);
-				
-				if (level.getPlayer().hasTarget()) ((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
+				if (level.getPlayer().hasTarget())
+				{
+					double mouseX = (event.getX() / SCALE);
+					double mouseY = (event.getY() / SCALE);
+					
+					Vector2 mousePos = new Vector2(mouseX, mouseY);
+					
+					((Unit)level.getPlayer().getTarget()).lookAt(mousePos);
+				}
 			}
 			catch (Exception e)
 			{
@@ -266,12 +291,12 @@ public class Game extends Canvas implements Runnable
 				{
 					case KeyEvent.VK_LEFT:
 					case KeyEvent.VK_A:
-						if (level.getPlayer().hasTarget()) level.getPlayer().moveTargetLeft();
+						if (level.getPlayer().hasTarget()) level.getPlayer().targetMoveLeft();
 						break;
 						
 					case KeyEvent.VK_RIGHT:
 					case KeyEvent.VK_D:
-						if (level.getPlayer().hasTarget()) level.getPlayer().moveTargetRight();
+						if (level.getPlayer().hasTarget()) level.getPlayer().targetMoveRight();
 						break;
 						
 					case KeyEvent.VK_UP:

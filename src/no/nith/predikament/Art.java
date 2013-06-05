@@ -16,6 +16,7 @@ public class Art
 	public Bitmap[][] items = loadAndCut("/images/items.png", 16, 16);
 	public Bitmap[][] background = loadAndCut("/images/background.png", 320, 240);
 	public Bitmap[][] other = loadAndCut("/images/other.png", 16, 16);
+	public Bitmap[][] lights = loadAndCut("/images/lights.png", 16, 16);
 	
 	public static void init() 
 	{
@@ -32,7 +33,7 @@ public class Art
 		}
 		catch (IOException e) 
 		{ 
-			throw new RuntimeException("Failed to load" + name);
+			throw new RuntimeException("Failed to load " + name);
 		}
 		
 		int xSlices = img.getWidth() / sw;

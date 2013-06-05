@@ -32,7 +32,7 @@ public class Bitmap
 
 	public void clear(int color)
 	{
-		//int color = ((r&0x0ff)<<16)|((g&0x0ff)<<8)|(b&0x0ff); //65536 * r + 256 * g + b; 
+		//int color = ((r&0x0ff)<<16)|((g&0x0ff)<<8)|(b&0x0ff); //65536 * r + 256 * g + b;
 		Arrays.fill(pixels, color);
 	}
 	
@@ -166,6 +166,30 @@ public class Bitmap
 				pixels[x + y * w] = color;
 			}
 		}
+	}
+	
+	public void multiply(Bitmap other, double x0, double y0)
+	{
+		multiply(other, (int) x0, (int) y0);
+	}
+	
+	public void multiply(Bitmap other, int x0, int y0)
+	{
+		for (int y = 0; y < other.h; ++y)
+		{
+			for (int x = 0; x < other.w; ++x)
+			{
+				int xa = x + x0;
+				int ya = y + y0;
+				
+				if (xa >= 0 && xa < w && ya >= 0 && ya < h) pixels[xa + ya * w] |= other.pixels[x + y * other.w] << 32;
+			}
+		}
+	}
+	
+	public void draw(Bitmap b, double xp, double yp)
+	{
+		draw(b, (int) xp, (int) yp);
 	}
 	
 	public void draw(Bitmap b, int xp, int yp)
