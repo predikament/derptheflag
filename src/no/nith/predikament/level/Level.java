@@ -17,10 +17,9 @@ public class Level
 {
 	public final Vector2 GRAVITY = new Vector2(0, 0.95);
 	public final Vector2 FRICTION = new Vector2(0.991, 1);
-	private Player player;
 	private final int width;
 	private final int height;
-	
+	private Player player;	
 	private List<Block> blocks;
 	private List<Entity> entities;
 	private List<Weapon> bullets;
@@ -56,7 +55,7 @@ public class Level
 				block_pos.x = x * Block.WIDTH;
 				block_pos.y = y * Block.HEIGHT;
 				
-				blocks.add(new GrassBlock(block_pos));
+				blocks.add(new EmptyBlock(block_pos));
 			}
 		}
 

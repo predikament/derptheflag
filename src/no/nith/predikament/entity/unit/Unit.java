@@ -15,11 +15,9 @@ public abstract class Unit extends PhysicsEntity
 	private int ySpriteIndex;
 	private int frame;
 	private Vector2 direction;
-	private static final Vector2 JUMP_VECTOR = new Vector2(0, -300);
 	private static final Vector2 VELOCITY_MAX =  new Vector2(100, 400);
 	private static final Vector2 BULLET_OFFSET = new Vector2(8.0f, 0);
 	private boolean running;
-	private boolean jumping;
 	private boolean shooting;
 	private Vector2 lookingAtPosition;
 	private Stopwatch walkTimer, shootTimer;
@@ -34,7 +32,6 @@ public abstract class Unit extends PhysicsEntity
 		
 		frame = 0;
 		running = false;
-		jumping = false;
 		shooting = false;
 		
 		lookingAtPosition = new Vector2(0, 0);
@@ -82,8 +79,6 @@ public abstract class Unit extends PhysicsEntity
 		
 		if (getVelocity().x != 0 && !running) setRunning(true);
 		else if (getVelocity().x == 0) setRunning(false);
-		
-		if (jumping && getVelocity().y == 0) jumping = false;
 
 		if (shooting && shootTimer.getElapsedTime() >= 150) setShooting(false);
 		
@@ -124,7 +119,7 @@ public abstract class Unit extends PhysicsEntity
 		Vector2 difference = new Vector2(mousePos.x - playerPos.x, mousePos.y - playerPos.y);
 		Vector2 angle = Vector2.radianToVector(Math.toRadians(Math.atan2(difference.y, difference.x) * 180 / Math.PI));
 		
-		level.addEntity(new Lazer(playerPos, angle));
+		level.addEntity(new Bullet(playerPos, angle));
 	}
 	
 	public void lookAt(final Vector2 position)
@@ -138,16 +133,6 @@ public abstract class Unit extends PhysicsEntity
 		if (lookingAtPosition.y <= getHitbox().getCenterY()) direction.y = -1;
 		else if (lookingAtPosition.y > getHitbox().getCenterY()) direction.y = 1;
 		else direction.y = 0;
-	}
-	
-	public void jump()
-	{
-		if (!jumping)
-		{
-			setVelocity(Vector2.add(getVelocity(), JUMP_VECTOR));
-			
-			jumping = true;
-		}
 	}
 	
 	public void setPosition(Vector2 position)

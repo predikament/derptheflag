@@ -27,7 +27,7 @@ public class Game extends Canvas implements Runnable
 	
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
-	public static final int SCALE	= 4;
+	public static final int SCALE	= 3;
 	
 	private boolean keepRunning;
 	
@@ -306,7 +306,7 @@ public class Game extends Canvas implements Runnable
 						break;
 						
 					case KeyEvent.VK_SPACE:
-						if (level.getPlayer().hasTarget()) ((Unit)level.getPlayer().getTarget()).jump();
+						// if (level.getPlayer().hasTarget()) level.getPlayer().getTarget().jump();
 						break;
 					
 					case KeyEvent.VK_ESCAPE:

@@ -182,7 +182,13 @@ public class Bitmap
 				int xa = x + x0;
 				int ya = y + y0;
 				
-				if (xa >= 0 && xa < w && ya >= 0 && ya < h) pixels[xa + ya * w] |= other.pixels[x + y * other.w] << 32;
+				if (xa >= 0 && xa < w && ya >= 0 && ya < h)
+				{
+					pixels[xa + ya * w] = (pixels[xa + ya * w] + other.pixels[x + y * other.w]) / 2;
+					/*pixels[xa + ya * w] = 
+							(pixels[xa + ya * w] & other.pixels[x + y * other.w]) + 
+							(pixels[xa + ya * w] ^ other.pixels[x + y * other.w]) >> 1;*/
+				}
 			}
 		}
 	}
