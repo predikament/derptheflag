@@ -9,22 +9,23 @@ import no.nith.predikament.Bitmap;
 import no.nith.predikament.player.Player;
 import no.nith.predikament.entity.*;
 import no.nith.predikament.entity.block.*;
+import no.nith.predikament.entity.camera.Camera;
 import no.nith.predikament.entity.weapon.*;
 import no.nith.predikament.entity.particle.*;
 import no.nith.predikament.util.Vector2;
 
 public class Level 
 {
-	public final Vector2 GRAVITY = new Vector2(0, 0.95);
+	public final Vector2 GRAVITY = new Vector2(0, 0);
 	public final Vector2 FRICTION = new Vector2(0.991, 1);
 	private final int width;
 	private final int height;
-	private Player player;	
+	private Player player;
+	private Camera camera;
 	private List<Block> blocks;
 	private List<Entity> entities;
 	private List<Weapon> bullets;
 	private List<Particle> particles;
-	
 	public Level(int width, int height)
 	{
 		this.width = width;
@@ -39,6 +40,7 @@ public class Level
 	public void init()
 	{
 		player = new Player(this, null);
+		camera = new Camera(Vector2.zero(), width, height);
 		
 		blocks.clear();
 		entities.clear();
@@ -60,7 +62,6 @@ public class Level
 		}
 
 		if (player.hasTarget()) addEntity(player.getTarget());
-		if (player.hasPet()) addEntity(player.getPet());
 	}
 	
 	public synchronized void addEntity(Entity entity)
@@ -78,6 +79,11 @@ public class Level
 		if (player.hasTarget() && entities.contains(player.getTarget()) == false)
 		{
 			entities.add(player.getTarget());
+		}
+		
+		if (player.hasTarget() && player.getTarget().getHitbox() != null)
+		{
+			camera.getPosition().x = player.getTarget().getHitbox().getCenterX() - (width / 2.0);
 		}
 			
 		// Update blocks
@@ -128,7 +134,13 @@ public class Level
 		{
 			Weapon w = buls.next();
 			
-			if (w.wasRemoved() == false) w.update(dt);
+			if (w.wasRemoved() == false)
+			{
+				w.update(dt);
+				
+				// Remove bullet if outside of screen
+				if (w.getHitbox().intersects(0, 0, width, height) == false) w.remove();
+			}
 			else buls.remove();
 		}
 		
@@ -141,16 +153,10 @@ public class Level
 			
 			if (p.wasRemoved() == false)
 			{
-				Vector2 particle_vel = p.getVelocity();
-				particle_vel.x += GRAVITY.x;
-				particle_vel.y += GRAVITY.y * 0.2;
+				p.update(dt);
 				
-				((Particle)p).update(dt);
-				
-				if (p.getPosition().y > getHeight()) 
-				{ 
-					p.remove(); 
-				}
+				// Remove particle if outside of screen
+				if (p.getHitbox().intersects(0, 0, width, height) == false) p.remove();
 			}
 			else pars.remove();
 		}

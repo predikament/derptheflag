@@ -19,7 +19,7 @@ public abstract class Unit extends PhysicsEntity
 	private static final Vector2 BULLET_OFFSET = new Vector2(8.0f, 0);
 	private boolean running;
 	private boolean shooting;
-	private Vector2 lookingAtPosition;
+	public Vector2 lookingAtPosition;
 	private Stopwatch walkTimer, shootTimer;
 	
 	public Unit(Level level, int ySpriteIndex)
@@ -83,8 +83,12 @@ public abstract class Unit extends PhysicsEntity
 		if (shooting && shootTimer.getElapsedTime() >= 150) setShooting(false);
 		
 		if (running && walkTimer.getElapsedTime() >= 600) walkTimer.reset();
+		
+		rotAngle = rotAngle + (90 * dt);
+		if (rotAngle > 359) rotAngle = 0;
 	}
 	
+	private double rotAngle = 0;
 	public void render(Bitmap screen) 
 	{
 		boolean flip = getVelocity().x < 0;
@@ -104,6 +108,8 @@ public abstract class Unit extends PhysicsEntity
 		}
 		
 		screen.draw(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
+		// Testing rotation
+		screen.drawz(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, rotAngle);
 	}
 	
 	public synchronized void shoot()
@@ -119,7 +125,7 @@ public abstract class Unit extends PhysicsEntity
 		Vector2 difference = new Vector2(mousePos.x - playerPos.x, mousePos.y - playerPos.y);
 		Vector2 angle = Vector2.radianToVector(Math.toRadians(Math.atan2(difference.y, difference.x) * 180 / Math.PI));
 		
-		level.addEntity(new Bullet(playerPos, angle));
+		level.addEntity(new Lazer(playerPos, angle));
 	}
 	
 	public void lookAt(final Vector2 position)

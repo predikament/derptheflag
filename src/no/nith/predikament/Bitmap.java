@@ -11,9 +11,7 @@ public class Bitmap
 	
 	public Bitmap(int w, int h) 
 	{
-		this.w = w;
-		this.h = h;
-		this.pixels = new int[w * h];
+		this(w, h, new int[w * h]);
 	}
 	
 	public Bitmap(int w, int h, int[] pixels) 
@@ -30,6 +28,43 @@ public class Bitmap
 		this.pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
 	}
 
+	@SuppressWarnings("unused")
+	// Creates a kernel for use with a Gaussian-filtered blur
+	// Currently unused
+	private double[][] createFilter()
+	{
+		double result[][] = new double[5][5];
+		
+		// set standard deviation to 1.0
+	    double sigma = 1.0;
+	    double r, s = 2.0 * sigma * sigma;
+	 
+	    // sum is for normalization
+	    double sum = 0.0;
+	 
+	    // generate 5x5 kernel
+	    for (int x = -2; x <= 2; x++)
+	    {
+	        for(int y = -2; y <= 2; y++)
+	        {
+	            r = Math.sqrt(x*x + y*y);
+	            result[x + 2][y + 2] = (Math.exp(-(r*r)/s))/(Math.PI * s);
+	            sum += result[x + 2][y + 2];
+	        }
+	    }
+	 
+	    // normalize the Kernel
+	    for(int i = 0; i < 5; ++i)
+	    {
+	        for(int j = 0; j < 5; ++j)
+	        {
+	            result[i][j] /= sum;
+	        }
+	    }
+		
+		return result;
+	}
+	
 	public void clear(int color)
 	{
 		//int color = ((r&0x0ff)<<16)|((g&0x0ff)<<8)|(b&0x0ff); //65536 * r + 256 * g + b;
@@ -54,8 +89,20 @@ public class Bitmap
 	
 	public void setPixel(int x, int y, int color)
 	{
-		if (x >= 0 && x < w && y >= 0 && y < h) pixels[x + y * w] = color;
-	}	
+		int cp = x + y * w;
+		
+		if (cp >= 0 && cp < pixels.length) pixels[cp] = color;
+		else System.out.println(String.format("Tried to set a pixel out of bounds at [%d, %d]. (Max [%d, %d])", x, y, w, h));
+	}
+	
+	public int getPixel(int x, int y)
+	{
+		int cp = x + y * w;
+		
+		if (cp >= 0 && cp < pixels.length) return pixels[x + y * w];
+		
+		return 0;
+	}
 	
 	public void drawLine(double x0, double y0, double x1, double y1, int color)
 	{
@@ -95,7 +142,7 @@ public class Bitmap
 		if (y0 < y1) ystep = 1;
 		else ystep = -1;
 		
-		for (int x = x0; x < x1; ++x)
+		for (int x = x0; x <= x1; ++x)
 		{
 			if (steep) setPixel(y, x, color);
 			else setPixel(x, y, color);
@@ -168,12 +215,17 @@ public class Bitmap
 		}
 	}
 	
-	public void multiply(Bitmap other, double x0, double y0)
+	public void blend(Bitmap other, double percentage)
 	{
-		multiply(other, (int) x0, (int) y0);
+		blend(other, 0, 0, percentage);
 	}
 	
-	public void multiply(Bitmap other, int x0, int y0)
+	public void blend(Bitmap other, double x0, double y0, double percentage)
+	{
+		blend(other, (int) x0, (int) y0, percentage);
+	}
+	
+	public void blend(Bitmap other, int x0, int y0, double percentage)
 	{
 		for (int y = 0; y < other.h; ++y)
 		{
@@ -184,10 +236,23 @@ public class Bitmap
 				
 				if (xa >= 0 && xa < w && ya >= 0 && ya < h)
 				{
-					pixels[xa + ya * w] = (pixels[xa + ya * w] + other.pixels[x + y * other.w]) / 2;
-					/*pixels[xa + ya * w] = 
-							(pixels[xa + ya * w] & other.pixels[x + y * other.w]) + 
-							(pixels[xa + ya * w] ^ other.pixels[x + y * other.w]) >> 1;*/
+					// Blends all pixels at targeted position by percentage
+					int srcA = (other.pixels[x + y * other.w] & ~0x00FFFFFF) >>> 24;
+					int srcR = (other.pixels[x + y * other.w] & ~0xFF00FFFF) >>> 16;
+					int srcG = (other.pixels[x + y * other.w] & ~0xFFFF00FF) >>> 8;
+					int srcB = other.pixels[x + y * other.w] & ~0xFFFFFF00;
+					
+					int dstA = (pixels[xa + ya * w] & ~0x00FFFFFF) >>> 24;
+					int dstR = (pixels[xa + ya * w] & ~0xFF00FFFF) >>> 16;
+					int dstG = (pixels[xa + ya * w] & ~0xFFFF00FF) >>> 8;
+					int dstB = pixels[xa + ya * w] & ~0xFFFFFF00;
+					
+					int newA = dstA + (int) ((srcA - dstA) * percentage);
+					int newR = dstR + (int) ((srcR - dstR) * percentage);
+					int newG = dstG + (int) ((srcG - dstG) * percentage);
+					int newB = dstB + (int) ((srcB - dstB) * percentage);
+					
+					pixels[xa + ya * w] = (newA << 24) | (newR << 16) | (newG << 8) | newB; 
 				}
 			}
 		}
@@ -240,8 +305,99 @@ public class Bitmap
 				for (int x = x0; x < x1; ++x)
 				{
 					int c = b.pixels[sp + x];
+
+					if (c < 0) pixels[dp + x] = c; // Transparency
+				}
+			}
+		}
+	}
+	
+	public void drawz(Bitmap b, int xp, int yp, double angle) 
+	{
+		double angleInRad = Math.toRadians(angle);
+		
+		double width = Math.ceil(b.w * Math.cos(angleInRad) - b.h * Math.sin(angleInRad));
+		double height = Math.ceil(b.w * Math.sin(angleInRad) + b.h * Math.cos(angleInRad));
+		
+		for (int y = 0; y < Math.abs(height); ++y)
+		{
+			for (int x = 0; x < Math.abs(width); ++x)
+			{
+				int rx = width > 0 ? x : -x;
+				int ry = height > 0 ? y : -y;
+				
+				double sx = rx * Math.cos(-angleInRad) - ry * Math.sin(-angleInRad);
+				double sy = rx * Math.sin(-angleInRad) + ry * Math.cos(-angleInRad);
+
+				// Hent ut nærmeste fire pixler
+				// Bruk bilinær interpolering:
+				//
+				// Vekting for hver pixel:
+				// 
+				// double fx = sx - Math.floor(sx)
+				// double fy = sy - Math.floor(sy)
+				// double fx1 = 1.0 - fx
+				// double fy1 = 1.0 - fy
+				
+				// int w0 = fx1 * fy1 * 256.0;
+				// int w1 = fx * fy1 * 256.0;
+				// int w2 = fx1 * fy * 256.0;
+				// int w3 = fx * fy * 256.0;
+				
+				// Hent ut R/G/B
+				// Ut R = p0.r * w0 + p1.r * w1 + p2.r * w2 + p3.r * w3
+			}
+		}
+	}	
+	
+	public void drawy(Bitmap b, int xp, int yp, double angle) 
+	{
+		double angleInRad = Math.toRadians(angle);
+		
+		double cX = b.w / 2.0;
+		double cY = b.h / 2.0;
+		
+		for (int y = 0; y < b.h; ++y)
+		{
+			double ccY = cY - y;
+			
+			for (int x = 0; x < b.w; ++x)
+			{
+				double ccX = cX - x;
+				
+				double rx = ccX * Math.cos(angleInRad) - ccY * Math.sin(angleInRad) + (xp + cX);
+				double ry = ccX * Math.sin(angleInRad) + ccY * Math.cos(angleInRad) + (yp + cY);
+				
+				int rp = (int) rx + (int) ry * w;
+				
+				if (rp >= 0 && rp < pixels.length)
+				{
+					int c = b.pixels[x + y * b.w];
 					
-					if (c < 0) pixels[dp + x] = b.pixels[sp + x]; // Transparency
+					if (c < 0) pixels[rp] = c;
+				}
+			}
+		}
+	}
+	
+	public void drawx(Bitmap b, int xp, int yp, double angle) 
+	{
+		double angleInRad = (Math.PI / 180.0) * angle;
+		
+		for (int y = 0; y < b.h; ++y)
+		{
+			for (int x = 0; x < b.w; ++x)
+			{
+				double rx = x * Math.cos(angleInRad) - y * Math.sin(angleInRad) + xp;
+				double ry = x * Math.sin(angleInRad) + y * Math.cos(angleInRad) + yp;
+				
+				int rp = (int) rx + (int) ry * w;
+				
+				if (rp >= 0 && rp < pixels.length)
+				{
+					int c = b.pixels[x + y * b.w];
+					
+					if (c < 0) pixels[rp] = c;
 				}
 			}
 		}

@@ -17,6 +17,7 @@ import java.util.Random;
 import java.util.Set;
 import no.nith.predikament.entity.unit.Unit;
 import no.nith.predikament.level.Level;
+import no.nith.predikament.util.Stopwatch;
 import no.nith.predikament.util.Vector2;
 
 public class Game extends Canvas implements Runnable
@@ -25,9 +26,10 @@ public class Game extends Canvas implements Runnable
 	
 	private final Random random = new Random();
 	
+	public static final int FPS 	= 60;
 	public static final int WIDTH	= 320;
 	public static final int HEIGHT	= 240;
-	public static final int SCALE	= 3;
+	public static final int SCALE	= 4;
 	
 	private boolean keepRunning;
 	
@@ -35,6 +37,7 @@ public class Game extends Canvas implements Runnable
 	private Bitmap screenBitmap;
 	
 	private InputHandler inputHandler;
+	private Stopwatch frameTimer;
 	
 	private int currentFrameCount;
 	
@@ -54,6 +57,7 @@ public class Game extends Canvas implements Runnable
 		
 		inputHandler = new InputHandler(this);
 		displayFPS = false;
+		frameTimer = new Stopwatch(false);
 	}
 	
 	private void init() 
@@ -92,7 +96,7 @@ public class Game extends Canvas implements Runnable
 	{
 		screen.clear(0);
 		level.render(screen);
-		
+
 		currentFrameCount++;
 	}
 
@@ -128,6 +132,7 @@ public class Game extends Canvas implements Runnable
 		
 		long lastTime		= System.currentTimeMillis();
 		double lastFrameNs	= (double) System.nanoTime();
+		frameTimer.start();
 		
 		while (keepRunning)
 		{
@@ -135,8 +140,16 @@ public class Game extends Canvas implements Runnable
 			double thisFrameNs	= (double) System.nanoTime();
 			double deltaTime	= (thisFrameNs - lastFrameNs) / 1.0E9; //1000000000;
 			
+			// Update as often as possible
 			update(deltaTime);
-			render(screenBitmap);
+			
+			// Try to render at desired FPS
+			if (frameTimer.getElapsedTime() >= 1000 / FPS) 
+			{
+				render(screenBitmap);
+				
+				frameTimer.reset();
+			}
 			
 			boolean timeToResetFrameCounter = thisTime - lastTime >= 1000;
 			
@@ -177,14 +190,21 @@ public class Game extends Canvas implements Runnable
 		// MouseListener
 		public synchronized void mousePressed(MouseEvent event) 
 		{	
-			switch (event.getButton())
+			try
 			{
-				case FIRE_BUTTON:
-					if (level.getPlayer().hasTarget()) ((Unit)level.getPlayer().getTarget()).shoot();
-					break;
-				
-				default:
-					break;
+				switch (event.getButton())
+				{
+					case FIRE_BUTTON:
+						if (level.getPlayer().hasTarget()) ((Unit)level.getPlayer().getTarget()).shoot();
+						break;
+					
+					default:
+						break;
+				}
+			}
+			catch (Exception e)
+			{
+				// Eat exception
 			}
 		}
 		
