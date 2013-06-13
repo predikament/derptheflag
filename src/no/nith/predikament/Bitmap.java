@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 
+import no.nith.predikament.util.Vector2;
+
 public class Bitmap 
 {
 	public final int[] pixels;
@@ -92,7 +94,6 @@ public class Bitmap
 		int cp = x + y * w;
 		
 		if (cp >= 0 && cp < pixels.length) pixels[cp] = color;
-		else System.out.println(String.format("Tried to set a pixel out of bounds at [%d, %d]. (Max [%d, %d])", x, y, w, h));
 	}
 	
 	public int getPixel(int x, int y)
@@ -268,7 +269,66 @@ public class Bitmap
 		draw(b, xp, yp, false);
 	}
 	
-	public void draw(Bitmap b, int xp, int yp, boolean xFlip) 
+	public void draw(Bitmap b, int xp, int yp, boolean xFlip)
+	{
+		drawOld(b, xp, yp, xFlip);
+	}
+	
+	// Working draw function with rotation!
+	public void draw(Bitmap b, int xp, int yp, double angle, boolean xFlip)
+	{
+		double angleRad = Math.toRadians(angle);
+		
+		Vector2 v0 = new Vector2(1 * Math.cos(angleRad) - 1 * Math.sin(angleRad), 1 * Math.sin(angleRad) + 1 * Math.cos(angleRad));
+		Vector2 v1 = new Vector2(1 * Math.cos(angleRad) - (b.h - 1) * Math.sin(angleRad), 1 * Math.sin(angleRad) + (b.h - 1) * Math.cos(angleRad));
+		Vector2 v2 = new Vector2((b.w - 1) * Math.cos(angleRad) - 1 * Math.sin(angleRad), (b.w - 1) * Math.sin(angleRad) + 1 * Math.cos(angleRad));
+		Vector2 v3 = new Vector2((b.w - 1) * Math.cos(angleRad) - (b.h - 1) * Math.sin(angleRad), (b.w - 1) * Math.sin(angleRad) + (b.h - 1) * Math.cos(angleRad));
+		
+		int xMin = (int) Math.floor(Math.min(v0.x, Math.min(v1.x, Math.min(v2.x, v3.x))));
+		int yMin = (int) Math.floor(Math.min(v0.y, Math.min(v1.y, Math.min(v2.y, v3.y))));
+		int xMax = (int) Math.ceil(Math.max(v0.x, Math.max(v1.x, Math.max(v2.x, v3.x))));
+		int yMax = (int) Math.ceil(Math.max(v0.y, Math.max(v1.y, Math.max(v2.y, v3.y))));
+		
+		if (xFlip)
+		{
+			for (int y = yMin; y <= yMax; y++)
+			{
+				for (int x = xMin; x <= xMax; x++)
+				{
+					int rx = (int) (x * Math.cos(-angleRad) - y * Math.sin(-angleRad));
+					int ry = (int) (x * Math.sin(-angleRad) + y * Math.cos(-angleRad));
+					
+					if (rx >= 0 && rx < b.w && ry >= 0 && ry < b.h)
+					{
+						int p = b.getPixel((b.w - 1) - rx, ry);
+						
+						if (p < 0) setPixel(xp + x, yp + y, p);
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int y = yMin; y <= yMax; y++)
+			{
+				for (int x = xMin; x <= xMax; x++)
+				{
+					int rx = (int) (x * Math.cos(-angleRad) - y * Math.sin(-angleRad));
+					int ry = (int) (x * Math.sin(-angleRad) + y * Math.cos(-angleRad));
+					
+					if (rx >= 0 && rx < b.w && ry >= 0 && ry < b.h)
+					{
+						int p = b.getPixel(rx, ry);
+						
+						if (p < 0) setPixel(xp + x, yp + y, p);
+					}
+				}
+			}
+		}
+	}
+	
+	// Old draw function with no rotation
+	private void drawOld(Bitmap b, int xp, int yp, boolean xFlip) 
 	{
 		int x0 = xp;
 		int x1 = xp + b.w;
@@ -312,45 +372,9 @@ public class Bitmap
 		}
 	}
 	
-	public void drawz(Bitmap b, int xp, int yp, double angle) 
-	{
-		double angleInRad = Math.toRadians(angle);
-		
-		double width = Math.ceil(b.w * Math.cos(angleInRad) - b.h * Math.sin(angleInRad));
-		double height = Math.ceil(b.w * Math.sin(angleInRad) + b.h * Math.cos(angleInRad));
-		
-		for (int y = 0; y < Math.abs(height); ++y)
-		{
-			for (int x = 0; x < Math.abs(width); ++x)
-			{
-				int rx = width > 0 ? x : -x;
-				int ry = height > 0 ? y : -y;
-				
-				double sx = rx * Math.cos(-angleInRad) - ry * Math.sin(-angleInRad);
-				double sy = rx * Math.sin(-angleInRad) + ry * Math.cos(-angleInRad);
-
-				// Hent ut nærmeste fire pixler
-				// Bruk bilinær interpolering:
-				//
-				// Vekting for hver pixel:
-				// 
-				// double fx = sx - Math.floor(sx)
-				// double fy = sy - Math.floor(sy)
-				// double fx1 = 1.0 - fx
-				// double fy1 = 1.0 - fy
-				
-				// int w0 = fx1 * fy1 * 256.0;
-				// int w1 = fx * fy1 * 256.0;
-				// int w2 = fx1 * fy * 256.0;
-				// int w3 = fx * fy * 256.0;
-				
-				// Hent ut R/G/B
-				// Ut R = p0.r * w0 + p1.r * w1 + p2.r * w2 + p3.r * w3
-			}
-		}
-	}	
-	
-	public void drawy(Bitmap b, int xp, int yp, double angle) 
+	// Working forward mapped draw function with centered pivot point
+	@SuppressWarnings("unused")
+	private void drawOldRotation2(Bitmap b, int xp, int yp, double angle) 
 	{
 		double angleInRad = Math.toRadians(angle);
 		
@@ -380,7 +404,9 @@ public class Bitmap
 		}
 	}
 	
-	public void drawx(Bitmap b, int xp, int yp, double angle) 
+	// Working forward mapped draw function
+	@SuppressWarnings("unused")
+	private void drawOldRotation1(Bitmap b, int xp, int yp, double angle) 
 	{
 		double angleInRad = (Math.PI / 180.0) * angle;
 		

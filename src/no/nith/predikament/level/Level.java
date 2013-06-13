@@ -16,7 +16,7 @@ import no.nith.predikament.util.Vector2;
 
 public class Level 
 {
-	public final Vector2 GRAVITY = new Vector2(0, 0);
+	public final Vector2 GRAVITY = new Vector2(0, 0.30);
 	public final Vector2 FRICTION = new Vector2(0.991, 1);
 	private final int width;
 	private final int height;

@@ -83,12 +83,8 @@ public abstract class Unit extends PhysicsEntity
 		if (shooting && shootTimer.getElapsedTime() >= 150) setShooting(false);
 		
 		if (running && walkTimer.getElapsedTime() >= 600) walkTimer.reset();
-		
-		rotAngle = rotAngle + (90 * dt);
-		if (rotAngle > 359) rotAngle = 0;
 	}
 	
-	private double rotAngle = 0;
 	public void render(Bitmap screen) 
 	{
 		boolean flip = getVelocity().x < 0;
@@ -107,9 +103,9 @@ public abstract class Unit extends PhysicsEntity
 			else frame = 3;
 		}
 		
-		screen.draw(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
+		// screen.draw(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
 		// Testing rotation
-		screen.drawz(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, rotAngle);
+		screen.draw(Art.instance.characters[frame][ySpriteIndex], (int) getPosition().x, (int) getPosition().y, flip);
 	}
 	
 	public synchronized void shoot()
