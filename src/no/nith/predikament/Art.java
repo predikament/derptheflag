@@ -8,15 +8,7 @@ public class Art
 {
 	public static Art instance;
 	
-	public Bitmap[][] blocks = loadAndCut("/images/blocks.png", 16, 16);
-	public Bitmap[][] characters = loadAndCut("/images/chars.png", 16, 16);
-	public Bitmap[][] pets = loadAndCut("/images/pets.png", 16, 16);
-	public Bitmap[][] particles = loadAndCut("/images/particles.png", 16, 16);
-	public Bitmap[][] enemies = loadAndCut("/images/enemies.png", 16, 16);
-	public Bitmap[][] items = loadAndCut("/images/items.png", 16, 16);
-	public Bitmap[][] background = loadAndCut("/images/background.png", 320, 240);
-	public Bitmap[][] other = loadAndCut("/images/other.png", 16, 16);
-	public Bitmap[][] lights = loadAndCut("/images/lights.png", 16, 16);
+	// public Bitmap[][] blocks = loadAndCut("/images/blocks.png", 16, 16);
 	
 	public static void init() 
 	{

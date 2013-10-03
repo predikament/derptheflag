@@ -289,39 +289,18 @@ public class Bitmap
 		int xMax = (int) Math.ceil(Math.max(v0.x, Math.max(v1.x, Math.max(v2.x, v3.x))));
 		int yMax = (int) Math.ceil(Math.max(v0.y, Math.max(v1.y, Math.max(v2.y, v3.y))));
 		
-		if (xFlip)
+		for (int y = yMin; y <= yMax; y++)
 		{
-			for (int y = yMin; y <= yMax; y++)
+			for (int x = xMin; x <= xMax; x++)
 			{
-				for (int x = xMin; x <= xMax; x++)
+				int rx = (int) (x * Math.cos(-angleRad) - y * Math.sin(-angleRad));
+				int ry = (int) (x * Math.sin(-angleRad) + y * Math.cos(-angleRad));
+				
+				if (rx >= 0 && rx < b.w && ry >= 0 && ry < b.h)
 				{
-					int rx = (int) (x * Math.cos(-angleRad) - y * Math.sin(-angleRad));
-					int ry = (int) (x * Math.sin(-angleRad) + y * Math.cos(-angleRad));
+					int p = xFlip ? b.getPixel((b.w - 1) - rx, ry) : b.getPixel(rx, ry);
 					
-					if (rx >= 0 && rx < b.w && ry >= 0 && ry < b.h)
-					{
-						int p = b.getPixel((b.w - 1) - rx, ry);
-						
-						if (p < 0) setPixel(xp + x, yp + y, p);
-					}
-				}
-			}
-		}
-		else
-		{
-			for (int y = yMin; y <= yMax; y++)
-			{
-				for (int x = xMin; x <= xMax; x++)
-				{
-					int rx = (int) (x * Math.cos(-angleRad) - y * Math.sin(-angleRad));
-					int ry = (int) (x * Math.sin(-angleRad) + y * Math.cos(-angleRad));
-					
-					if (rx >= 0 && rx < b.w && ry >= 0 && ry < b.h)
-					{
-						int p = b.getPixel(rx, ry);
-						
-						if (p < 0) setPixel(xp + x, yp + y, p);
-					}
+					if (p < 0) setPixel(xp + x, yp + y, p);
 				}
 			}
 		}
