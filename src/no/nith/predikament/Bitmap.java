@@ -187,12 +187,12 @@ public class Bitmap
 		}
 	}
 	
-	public void drawSquare(double x0, double y0, double x1, double y1, int color)
+	public void drawRectangle(double x0, double y0, double x1, double y1, int color)
 	{
-		drawSquare((int) x0, (int) y0, (int) x1, (int) y1, color);
+		drawRectangle((int) x0, (int) y0, (int) x1, (int) y1, color);
 	}
 	
-	public void drawSquare(int x0, int y0, int x1, int y1, int color)
+	public void drawRectangle(int x0, int y0, int x1, int y1, int color)
 	{
 		drawLine(x0, y0, x1, y0, color);
 		drawLine(x0, y1, x1, y1, color);
@@ -269,13 +269,60 @@ public class Bitmap
 		draw(b, xp, yp, false);
 	}
 	
+	public void draw(Bitmap b, double xp, double yp, boolean xFlip)
+	{
+		draw(b, (int) xp, (int) yp, xFlip);
+	}
+	
 	public void draw(Bitmap b, int xp, int yp, boolean xFlip)
 	{
-		drawOld(b, xp, yp, xFlip);
+		if (xFlip)
+		{
+			for (int x = 0; x < b.w; ++x)
+			{
+				for (int y = 0; y < b.h; ++y)
+				{
+					int dx = xp + x;
+					int dy = yp + y;
+					
+					if (dx >= 0 && dx < w && dy >= 0 && dy < h)
+					{
+						int c = b.pixels[(b.w - 1 - x) + y * b.w];
+						
+						if (c < 0) pixels[dx + dy * w] = c;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int x = 0; x < b.w; ++x)
+			{
+				for (int y = 0; y < b.h; ++y)
+				{
+					int dx = xp + x;
+					int dy = yp + y;
+					
+					if (dx >= 0 && dx < w && dy >= 0 && dy < h)
+					{
+						int c = b.pixels[x + y * b.w];
+						
+						if (c < 0) pixels[dx + dy * w] = c;
+					}
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void draw(Bitmap b, double xp, double yp, double angle, boolean xFlip)
+	{
+		draw(b, (int) xp, (int) yp, 0, false);
 	}
 	
 	// Working draw function with rotation!
-	public void draw(Bitmap b, int xp, int yp, double angle, boolean xFlip)
+	@SuppressWarnings("unused")
+	private void drawRotated(Bitmap b, int xp, int yp, double angle, boolean xFlip)
 	{
 		double angleRad = Math.toRadians(angle);
 		
@@ -307,6 +354,7 @@ public class Bitmap
 	}
 	
 	// Old draw function with no rotation
+	@SuppressWarnings("unused")
 	private void drawOld(Bitmap b, int xp, int yp, boolean xFlip) 
 	{
 		int x0 = xp;
@@ -330,7 +378,7 @@ public class Bitmap
 				{
 					int c = b.pixels[sp - x];
 					
-					if (c < 0) pixels[dp + x] = b.pixels[sp - x]; // Transparency
+					if (c < 0) pixels[dp + x] = c; // Transparency
 				}
 			}
 		}

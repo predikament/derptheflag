@@ -21,9 +21,9 @@ public class Game extends Canvas implements Runnable
 	private static final long serialVersionUID = 1L;
 	
 	public static final int FPS 	= 60;
-	public static final int WIDTH	= 320;
-	public static final int HEIGHT	= 240;
-	public static final int SCALE	= 4;
+	public static final int WIDTH	= 640;
+	public static final int HEIGHT	= 480;
+	public static final int SCALE	= 2;
 	
 	private boolean keepRunning;
 	
@@ -36,6 +36,10 @@ public class Game extends Canvas implements Runnable
 	private int currentFrameCount;
 	
 	private boolean displayFPS;
+	
+	private static int LEVEL_WIDTH = 20;
+	private static int LEVEL_HEIGHT = 20;
+	private int level[][] = new int[LEVEL_WIDTH][LEVEL_HEIGHT];
 	
 	public Game()
 	{
@@ -62,6 +66,14 @@ public class Game extends Canvas implements Runnable
 		keepRunning = true;
 		
 		currentFrameCount = 0;
+		
+		for (int x = 0; x < level.length; ++x)
+		{
+			for (int y = 0; y < level[0].length; ++y)
+			{
+				level[x][y] = (int) (Math.random() * 4);
+			}
+		}
 	}
 	
 	public void start()
@@ -81,8 +93,10 @@ public class Game extends Canvas implements Runnable
 	
 	private void render(Bitmap screen)
 	{
-		screen.clear(0);
-
+		screen.clear(0xFFFFFFFF);
+		
+		// Render level
+		
 		currentFrameCount++;
 	}
 

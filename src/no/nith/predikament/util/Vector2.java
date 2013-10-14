@@ -126,4 +126,24 @@ public class Vector2
 	{
 		return new Vector2(Math.cos(rad), Math.sin(rad));
 	}
+	
+	public static Vector2 isoTo2D(Vector2 v)
+	{
+		Vector2 result = new Vector2();
+		
+		result.x = (2 * v.y + v.x) / 2;
+		result.y = (2 * v.y - v.x) / 2;
+		
+		return result;
+	}
+	
+	public static Vector2 twoDToIso(Vector2 v)
+	{
+		Vector2 result = new Vector2();
+		
+		result.x = v.x - v.y;
+		result.y = (v.x + v.y) / 2;
+		
+		return result;
+	}
 }

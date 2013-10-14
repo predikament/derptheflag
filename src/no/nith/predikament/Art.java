@@ -8,7 +8,7 @@ public class Art
 {
 	public static Art instance;
 	
-	// public Bitmap[][] blocks = loadAndCut("/images/blocks.png", 16, 16);
+	public Bitmap[][] tiles = loadAndCut("/images/tiles.png", 32, 32);
 	
 	public static void init() 
 	{
