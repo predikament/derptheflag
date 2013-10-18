@@ -2,9 +2,13 @@ package no.nith.predikament.util;
 
 import java.awt.Point;
 
+/*
+ * Immutable class representing a 2D vector 
+ */
+
 public class Vector2 
 {
-	public double x, y;
+	private final double x, y;
 	
 	public Vector2()
 	{
@@ -25,6 +29,16 @@ public class Vector2
 	{
 		this.x = x;
 		this.y = y;
+	}
+	
+	public final double getX()
+	{
+		return x;
+	}
+	
+	public final double getY()
+	{
+		return y;
 	}
 	
 	public String toString()
@@ -49,12 +63,10 @@ public class Vector2
 	
 	public static double distanceBetween(final Vector2 u, final Vector2 v)
 	{
-		Vector2 result = new Vector2();
+		double x = u.getX() - v.getX();
+		double y = u.getY() - v.getY();
 		
-		result.x = u.x - v.x;
-		result.y = u.y - v.y;
-		
-		return Math.sqrt(result.x * result.x + result.y * result.y);
+		return Math.sqrt(x * x + y * y);
 	}
 	
 	public double distanceTo(final Vector2 u)
@@ -129,20 +141,20 @@ public class Vector2
 	
 	public static Vector2 isoTo2D(Vector2 v)
 	{
-		Vector2 result = new Vector2();
+		double x = (2 * v.getY() + v.getX()) / 2;
+		double y = (2 * v.getY() - v.getX()) / 2;
 		
-		result.x = (2 * v.y + v.x) / 2;
-		result.y = (2 * v.y - v.x) / 2;
+		Vector2 result = new Vector2(x, y);
 		
 		return result;
 	}
 	
 	public static Vector2 twoDToIso(Vector2 v)
 	{
-		Vector2 result = new Vector2();
+		double x = v.getX() - v.getY();
+		double y = (v.getX() + v.getY()) / 2;
 		
-		result.x = v.x - v.y;
-		result.y = (v.x + v.y) / 2;
+		Vector2 result = new Vector2(x, y);
 		
 		return result;
 	}

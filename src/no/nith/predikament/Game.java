@@ -20,10 +20,11 @@ public class Game extends Canvas implements Runnable
 {
 	private static final long serialVersionUID = 1L;
 	
-	public static final int FPS 	= 60;
-	public static final int WIDTH	= 640;
-	public static final int HEIGHT	= 480;
-	public static final int SCALE	= 2;
+	public static final String TITLE 	= "Plants vs Retards";	
+	public static final int	FPS 		= 60;
+	public static final int HEIGHT		= 480;
+	public static final int WIDTH		= HEIGHT * 16 / 9;	
+	public static final int SCALE		= 1;
 	
 	private boolean keepRunning;
 	
@@ -34,12 +35,9 @@ public class Game extends Canvas implements Runnable
 	private Stopwatch frameTimer;
 	
 	private int currentFrameCount;
+	private int updatesPerSecond;
 	
 	private boolean displayFPS;
-	
-	private static int LEVEL_WIDTH = 20;
-	private static int LEVEL_HEIGHT = 20;
-	private int level[][] = new int[LEVEL_WIDTH][LEVEL_HEIGHT];
 	
 	public Game()
 	{
@@ -52,8 +50,13 @@ public class Game extends Canvas implements Runnable
 		setFocusable(true);
 		
 		inputHandler = new InputHandler(this);
-		displayFPS = false;
+		displayFPS = true;
 		frameTimer = new Stopwatch(false);
+		
+		currentFrameCount = 0;
+		updatesPerSecond = 0;
+		
+		keepRunning = true;
 	}
 	
 	private void init() 
@@ -62,18 +65,6 @@ public class Game extends Canvas implements Runnable
 		
 		screenImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		screenBitmap = new Bitmap(screenImage);
-		
-		keepRunning = true;
-		
-		currentFrameCount = 0;
-		
-		for (int x = 0; x < level.length; ++x)
-		{
-			for (int y = 0; y < level[0].length; ++y)
-			{
-				level[x][y] = (int) (Math.random() * 4);
-			}
-		}
 	}
 	
 	public void start()
@@ -95,9 +86,7 @@ public class Game extends Canvas implements Runnable
 	{
 		screen.clear(0xFFFFFFFF);
 		
-		// Render level
-		
-		currentFrameCount++;
+		++currentFrameCount;
 	}
 
 	private void swap()
@@ -120,7 +109,7 @@ public class Game extends Canvas implements Runnable
 		
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, screenWidth, screenHeight);
-		g.drawImage(screenImage, (screenWidth-w) / 2, (screenHeight - h) / 2, w, h, null);
+		g.drawImage(screenImage, (screenWidth - w) / 2, (screenHeight - h) / 2, w, h, null);
 		g.dispose();
 		
 		bs.show();
@@ -132,6 +121,7 @@ public class Game extends Canvas implements Runnable
 		
 		long lastTime		= System.currentTimeMillis();
 		double lastFrameNs	= (double) System.nanoTime();
+		
 		frameTimer.start();
 		
 		while (keepRunning)
@@ -143,6 +133,8 @@ public class Game extends Canvas implements Runnable
 			// Update as often as possible
 			update(deltaTime);
 			
+			++updatesPerSecond;
+			
 			// Try to render at desired FPS
 			if (frameTimer.getElapsedTime() >= 1000 / FPS) 
 			{
@@ -151,19 +143,29 @@ public class Game extends Canvas implements Runnable
 				frameTimer.reset();
 			}
 			
-			boolean timeToResetFrameCounter = thisTime - lastTime >= 1000;
+			boolean timeToResetCounters = thisTime - lastTime >= 1000;
 			
-			if (timeToResetFrameCounter)
+			if (timeToResetCounters)
 			{
-				if (displayFPS)	System.out.println(String.format("%d fps ", currentFrameCount));
+				if (displayFPS)
+				{
+					String output = String.format("%d fps, %d ups", currentFrameCount, updatesPerSecond);
+					
+					System.out.println(output);
+				}
 				
 				currentFrameCount = 0;
+				updatesPerSecond = 0;
+				
 				lastTime = thisTime;
 			}
 
 			lastFrameNs = (double) System.nanoTime();
 			
 			swap();
+			
+			// Sleep 1 millisecond per update cycle to allow potential worker-threads to catch up
+			try { Thread.sleep(1); } catch (InterruptedException ie) { ie.printStackTrace(); System.exit(1); }
 		}
 		
 		System.exit(0);
@@ -179,7 +181,7 @@ public class Game extends Canvas implements Runnable
 		{
 			this.game = game;
 			
-			pressedKeys = Collections.synchronizedSet(new HashSet<Integer>(0));
+			pressedKeys = Collections.synchronizedSet(new HashSet<Integer>());
 			
 			game.addKeyListener(this);
 			game.addMouseListener(this);

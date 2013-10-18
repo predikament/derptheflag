@@ -8,14 +8,15 @@ public class DerpTheFlag
 	{
 		Game game = new Game();
 		
-		JFrame frame = new JFrame("HERPDERPZERPFLERPSHNERPKERP THE FLAG");
+		JFrame frame = new JFrame(Game.TITLE);
+		
+		frame.setResizable(false);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		frame.add(game);
 		frame.pack();
 		
-		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		
 		game.start();

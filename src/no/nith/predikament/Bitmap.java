@@ -29,43 +29,6 @@ public class Bitmap
 		this.h = img.getHeight();
 		this.pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
 	}
-
-	@SuppressWarnings("unused")
-	// Creates a kernel for use with a Gaussian-filtered blur
-	// Currently unused
-	private double[][] createFilter()
-	{
-		double result[][] = new double[5][5];
-		
-		// set standard deviation to 1.0
-	    double sigma = 1.0;
-	    double r, s = 2.0 * sigma * sigma;
-	 
-	    // sum is for normalization
-	    double sum = 0.0;
-	 
-	    // generate 5x5 kernel
-	    for (int x = -2; x <= 2; x++)
-	    {
-	        for(int y = -2; y <= 2; y++)
-	        {
-	            r = Math.sqrt(x*x + y*y);
-	            result[x + 2][y + 2] = (Math.exp(-(r*r)/s))/(Math.PI * s);
-	            sum += result[x + 2][y + 2];
-	        }
-	    }
-	 
-	    // normalize the Kernel
-	    for(int i = 0; i < 5; ++i)
-	    {
-	        for(int j = 0; j < 5; ++j)
-	        {
-	            result[i][j] /= sum;
-	        }
-	    }
-		
-		return result;
-	}
 	
 	public void clear(int color)
 	{
@@ -331,10 +294,10 @@ public class Bitmap
 		Vector2 v2 = new Vector2((b.w - 1) * Math.cos(angleRad) - 1 * Math.sin(angleRad), (b.w - 1) * Math.sin(angleRad) + 1 * Math.cos(angleRad));
 		Vector2 v3 = new Vector2((b.w - 1) * Math.cos(angleRad) - (b.h - 1) * Math.sin(angleRad), (b.w - 1) * Math.sin(angleRad) + (b.h - 1) * Math.cos(angleRad));
 		
-		int xMin = (int) Math.floor(Math.min(v0.x, Math.min(v1.x, Math.min(v2.x, v3.x))));
-		int yMin = (int) Math.floor(Math.min(v0.y, Math.min(v1.y, Math.min(v2.y, v3.y))));
-		int xMax = (int) Math.ceil(Math.max(v0.x, Math.max(v1.x, Math.max(v2.x, v3.x))));
-		int yMax = (int) Math.ceil(Math.max(v0.y, Math.max(v1.y, Math.max(v2.y, v3.y))));
+		int xMin = (int) Math.floor(Math.min(v0.getX(), Math.min(v1.getX(), Math.min(v2.getX(), v3.getX()))));
+		int yMin = (int) Math.floor(Math.min(v0.getY(), Math.min(v1.getY(), Math.min(v2.getY(), v3.getY()))));
+		int xMax = (int) Math.ceil(Math.max(v0.getX(), Math.max(v1.getX(), Math.max(v2.getX(), v3.getX()))));
+		int yMax = (int) Math.ceil(Math.max(v0.getY(), Math.max(v1.getY(), Math.max(v2.getY(), v3.getY()))));
 		
 		for (int y = yMin; y <= yMax; y++)
 		{
@@ -454,5 +417,42 @@ public class Bitmap
 				}
 			}
 		}
+	}
+	
+	@SuppressWarnings("unused")
+	// Creates a kernel for use with a Gaussian-filtered blur
+	// Currently unused
+	private double[][] createFilter()
+	{
+		double result[][] = new double[5][5];
+		
+		// set standard deviation to 1.0
+	    double sigma = 1.0;
+	    double r, s = 2.0 * sigma * sigma;
+	 
+	    // sum is for normalization
+	    double sum = 0.0;
+	 
+	    // generate 5x5 kernel
+	    for (int x = -2; x <= 2; x++)
+	    {
+	        for(int y = -2; y <= 2; y++)
+	        {
+	            r = Math.sqrt(x*x + y*y);
+	            result[x + 2][y + 2] = (Math.exp(-(r*r)/s))/(Math.PI * s);
+	            sum += result[x + 2][y + 2];
+	        }
+	    }
+	 
+	    // normalize the Kernel
+	    for(int i = 0; i < 5; ++i)
+	    {
+	        for(int j = 0; j < 5; ++j)
+	        {
+	            result[i][j] /= sum;
+	        }
+	    }
+		
+		return result;
 	}
 }
